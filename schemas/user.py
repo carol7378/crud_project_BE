@@ -6,18 +6,29 @@ class Token(BaseModel):
     token_type:str
     user_id:str
 
-class UserCreate(BaseModel):
+class UserLogin(BaseModel):
     username: str 
     password: str
-    password_check: str 
-    name: str 
-
-    @field_validator('username', 'password', 'name', 'password_check')
+    
+    @model_validator(mode='before')
     @classmethod
     def not_empty(cls, v):
         if not v:
             raise HTTPException(status_code=400, detail='빈 값은 허용되지 않습니다.')
-#            raise ValueError('빈 값은 허용되지 않습니다.')
+        return v
+    
+    
+class UserCreate(BaseModel):
+    username: str = Field(..., description = "사용자의 닉네임")
+    password: str
+    password_check: str = Field(..., description = "작성한 비밀번호를 다시 입력")
+    name: str = Field(..., description = "사용자의 실제 이름")
+
+    @field_validator("username","password","password_check","name")
+    @classmethod
+    def not_empty(cls, v):
+        if not v:
+            raise HTTPException(status_code=400, detail='빈 값은 허용되지 않습니다.')
         return v
 
     @model_validator(mode='after')
@@ -25,5 +36,4 @@ class UserCreate(BaseModel):
     def passwords_match(cls,values):
         if values.password!=values.password_check:
             raise HTTPException(status_code=400, detail='비밀번호가 일치하지 않습니다')
-#            raise ValueError('비밀번호가 일치하지 않습니다')
         return values

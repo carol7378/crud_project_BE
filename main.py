@@ -1,13 +1,14 @@
 from fastapi import FastAPI
-import models
+import models.user as User
+import models.post as Post
 import database
-#from domain.post import post_router
-from domain.user import user_router
+from api import post
+from api import user
 
 app = FastAPI()
 
-models.Base.metadata.create_all(bind=database.engine)
-
+User.Base.metadata.create_all(bind=database.engine)
+Post.Base.metadata.create_all(bind=database.engine)
 
 def get_db():
     db = database.SessionLocal()
@@ -17,4 +18,5 @@ def get_db():
         db.close()
 
 
-app.include_router(user_router.router)
+app.include_router(user.router)
+app.include_router(post.router)
