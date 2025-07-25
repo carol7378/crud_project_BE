@@ -1,8 +1,8 @@
 from fastapi import FastAPI
 import models.user as User
-import models.post as Post
+#import models.post as Post
 import database
-from api import post
+#from api import post
 from api import user
 
 app = FastAPI()

@@ -2,7 +2,7 @@ from fastapi import HTTPException
 from sqlalchemy.orm import Session
 import schemas.user as schemas
 from models.user import User
-from models.post import Post
+#from models.post import Post
 from passlib.context import CryptContext
 from datetime import timedelta
 from auth import create_access_token

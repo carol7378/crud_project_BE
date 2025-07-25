@@ -1,7 +1,7 @@
 from sqlalchemy.orm import Session
 from database import engine
 from models.user import User
-from models.post import Post
+#from models.post import Post
 
 with Session(engine) as session:
 
