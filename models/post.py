@@ -18,7 +18,7 @@ class Post(Base):
     __tablename__ = "posts"
     id = Column(Integer, primary_key=True,autoincrement=True)
     title = Column(String(100), nullable=False)
-    username = Column(String(30), ForeignKey('users.username',ondelete='CASCADE'),nullable=False)
+    user_id = Column(Integer, ForeignKey('users.id',ondelete='CASCADE'),nullable=False)
     content = Column(String(300), nullable=False)
     create_at = Column(DateTime, server_default=text('CURRENT_TIMESTAMP'), nullable=False)
     removed_at = Column(DateTime, nullable=True)
