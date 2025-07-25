@@ -12,9 +12,3 @@ with Session(engine) as session:
     ])
     session.commit()
 
-    session.add_all([
-        Post(title="Hello", content="Hello World", username="B"),
-        Post(title="Apple", content="Hello Apple", username="A"),
-        Post(title="Peach", content="Hello Peach", username="C"),
-    ])
-    session.commit()

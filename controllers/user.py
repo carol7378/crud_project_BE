@@ -3,12 +3,9 @@ from sqlalchemy.orm import Session
 import schemas.user as schemas
 from models.user import User
 #from models.post import Post
-from passlib.context import CryptContext
 from datetime import timedelta
 from auth import create_access_token
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-ACCESS_TOKEN_EXPIRE_MINUTES = 30
+from constants.user_constant import ACCESS_TOKEN_EXPIRE_MINUTES, pwd_context
 
 def create_user(user: schemas.UserCreate, db: Session):
     existing_user = db.query(User).filter(
@@ -27,7 +24,7 @@ def login_user(user: schemas.UserLogin, db: Session):
     elif not pwd_context.verify(user.password,db_user.password):
         raise HTTPException(status_code=400, detail="Incorrect username or password")
     access_token = create_access_token(
-        data={"sub":db_user.name},
+        data={"sub":db_user.username},
         expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     )
-    return {"access_token":access_token,"token_type":"bearer"}
+    return {"access_token":access_token,"token_type":"bearer","user_id":user.username}

@@ -2,6 +2,7 @@ from fastapi import HTTPException
 from pydantic import BaseModel, Field, ValidationInfo, field_validator,model_validator
 
 class Token(BaseModel):
+    message:str
     access_token:str
     token_type:str
     user_id:str
@@ -25,7 +26,7 @@ class UserCreate(BaseModel):
     name: str = Field(..., description = "사용자의 실제 이름")
 
 
-    @model_validator(mode='before')
+    @field_validator("username","password","password_check","name",mode='before')
     @classmethod
     def not_empty(cls, v):
         if not v:
