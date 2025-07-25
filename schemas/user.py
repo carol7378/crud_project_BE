@@ -1,6 +1,12 @@
+import datetime
 from fastapi import HTTPException
 from pydantic import BaseModel, Field, ValidationInfo, field_validator,model_validator
 
+class TokenEncode(BaseModel):
+    username:str
+    id:int
+    exp:datetime.datetime = Field(default=datetime.datetime.now())
+    
 class Token(BaseModel):
     message:str
     access_token:str

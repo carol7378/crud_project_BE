@@ -24,7 +24,7 @@ def login_user(user: schemas.UserLogin, db: Session):
     elif not pwd_context.verify(user.password,db_user.password):
         raise HTTPException(status_code=400, detail="Incorrect username or password")
     access_token = create_access_token(
-        data={"sub":db_user.username+str(db_user.id)},
+        data=schemas.TokenEncode(username=db_user.username,id=db_user.id),
         expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
     )
     return {"access_token":access_token,"token_type":"bearer","user_id":user.username}
