@@ -5,8 +5,6 @@ import datetime
 from models.user import User
 from models.post import Post
 import schemas.post as post
-from database import get_db
-import typing
 #from ..constants.user_constant import pwd_context
 router = APIRouter(
     prefix="/api/posts",
@@ -15,10 +13,10 @@ router = APIRouter(
 #게시글 작성
 def create_post(post: post.PostCreate, db: Session):
     existing_user = db.query(User).filter(
-        User.user == post.user_id).first()
+        User.username == post.username).first()
     if existing_user is None:
         raise HTTPException(status_code=400, detail="username not found")
-    db_post = Post(title=post.title, user_id=post.user_id,
+    db_post = Post(title=post.title, user_id=existing_user.id,
                           content=post.content)
     db.add(db_post)
     db.commit()

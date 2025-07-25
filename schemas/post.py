@@ -1,6 +1,7 @@
 
 import datetime
-from pydantic import BaseModel, Field
+from fastapi import HTTPException
+from pydantic import BaseModel, Field, field_validator
 
 class Post(BaseModel):
     id : int
@@ -10,7 +11,7 @@ class Post(BaseModel):
     create_at: datetime.datetime
 
 class PostUpdate(BaseModel):
-    token: str
+#    token: str
     title: str 
     content: str 
 
@@ -18,6 +19,13 @@ class PostCreate(BaseModel):
     title: str = Field(..., max_length=100)
     username: str
     content: str = Field(..., max_length=300)
+    @field_validator("username","title","content",mode='before')
+    @classmethod
+    def not_empty(cls, v):
+        if not v:
+            raise HTTPException(status_code=400, detail='빈 값은 허용되지 않습니다.')
+        return v
 
     class Config:
         from_attributes = True
+        
