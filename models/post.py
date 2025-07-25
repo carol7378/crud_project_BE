@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Column , DateTime, ForeignKey, Integer, String, text
+from sqlalchemy import Column , DateTime, ForeignKey, Integer, String, text
 from sqlalchemy.orm import registry
 from database import Base,engine
 

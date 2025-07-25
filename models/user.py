@@ -1,7 +1,10 @@
 from sqlalchemy import VARBINARY, Column, Integer, String, BINARY
 from constants.user import pwd_context
 from database import Base, engine
+from sqlalchemy import Column, Integer, String
+from database import Base, engine
 from sqlalchemy.orm import registry
+
 mapper_registry = registry()
 
 

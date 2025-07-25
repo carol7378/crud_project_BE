@@ -1,6 +1,5 @@
-import jwt
 from sqlalchemy.orm import Session
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import HTTPException
 import datetime
 from models.user import User
 from models.post import Post
