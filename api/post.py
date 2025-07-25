@@ -3,7 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException
 import datetime
 from controllers.post import create_post, read_post, read_posts, update_post, delete_post
 from database import get_db
-from schemas.post import PostCreate, Post
+from schemas.post import PostCreate, Post,PostUpdate
 
 router = APIRouter(
     prefix="/api/posts",
@@ -27,7 +27,7 @@ def post_read(id :int, db: Session = Depends(get_db)):
 
 # 게시글 수정
 @router.put("/{id}")
-def post_update(id: int, post: PostCreate, db: Session = Depends(get_db)):
+def post_update(id: int, post: PostUpdate, db: Session = Depends(get_db)):
     return {"message": "Post updated successfully with id " + str(id),"contents":update_post(id=id, post=post, db=db)}
 
 #게시글 삭제

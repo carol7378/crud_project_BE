@@ -40,7 +40,7 @@ def read_posts(db: Session):
     return db_post
 
 # 게시글 수정
-def update_post(id: int, post: post.PostCreate, db: Session):
+def update_post(id: int, post: post.PostUpdate, db: Session):
     db_post = db.query(Post).filter(Post.id == id).first()
     if db_post is None:
         raise HTTPException(status_code=400, detail="wrong post id")
@@ -49,8 +49,8 @@ def update_post(id: int, post: post.PostCreate, db: Session):
         raise HTTPException(status_code=404, detail="Post has been removed")
     
     db_post.title = post.title
-    db_post.username = post.username
     db_post.content = post.content
+    db_post.create_at = datetime.datetime.now()
     db.commit()
     db.refresh(db_post)
     return db_post
