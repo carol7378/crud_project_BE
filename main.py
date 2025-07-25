@@ -8,7 +8,7 @@ from api import user
 app = FastAPI()
 
 User.Base.metadata.create_all(bind=database.engine)
-Post.Base.metadata.create_all(bind=database.engine)
+#Post.Base.metadata.create_all(bind=database.engine)
 
 def get_db():
     db = database.SessionLocal()
@@ -19,4 +19,4 @@ def get_db():
 
 
 app.include_router(user.router)
-app.include_router(post.router)
+#app.include_router(post.router)
