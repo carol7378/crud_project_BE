@@ -8,6 +8,12 @@ class TokenEncode(BaseModel):
     id: int
 
 
+class TokenEncode(BaseModel):
+    username: str
+    id: int
+    exp: datetime.datetime = Field(default=datetime.datetime.now())
+
+
 class Token(BaseModel):
     message: str
     access_token: str

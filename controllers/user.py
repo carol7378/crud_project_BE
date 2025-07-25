@@ -9,6 +9,9 @@ from datetime import timedelta
 from helpers.auth import create_access_token
 from constants.user import ACCESS_TOKEN_EXPIRE_MINUTES, pwd_context
 
+from datetime import timedelta
+from constants.user_constant import ACCESS_TOKEN_EXPIRE_MINUTES, pwd_context
+
 
 def create_user(user: schemas.UserCreate, db: Session):
     existing_user = db.query(User).filter(User.username == user.username).first()
