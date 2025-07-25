@@ -12,11 +12,13 @@ mapper_registry = registry()
 
 '''
 
-
 class User(Base):
     __tablename__ = "users"
+    __table_args__ = (
+        {'mysql_character_set': 'utf8mb4', 'mysql_collate': 'utf8mb4_unicode_520_ci'},
+    )
     id = Column(Integer, primary_key=True,autoincrement=True)
-    username = Column(String(30), unique=True, nullable=False)
+    username = Column(String(30) ,unique=True, nullable=False)
     name = Column(String(50), nullable=False)
     password = Column(String(100), nullable=False)
     
