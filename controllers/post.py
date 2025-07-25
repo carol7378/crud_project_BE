@@ -5,11 +5,6 @@ import datetime
 from models.user import User
 from models.post import Post
 import schemas.post as post
-#from ..constants.user_constant import pwd_context
-router = APIRouter(
-    prefix="/api/posts",
-)
-
 #게시글 작성
 def create_post(post: post.PostCreate, db: Session):
     existing_user = db.query(User).filter(

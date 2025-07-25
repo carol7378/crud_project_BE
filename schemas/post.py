@@ -11,9 +11,14 @@ class Post(BaseModel):
     create_at: datetime.datetime
 
 class PostUpdate(BaseModel):
-#    token: str
     title: str 
     content: str 
+    @field_validator("title","content",mode='before')
+    @classmethod
+    def not_empty(cls, v):
+        if not v:
+            raise HTTPException(status_code=400, detail='빈 값은 허용되지 않습니다.')
+        return v
 
 class PostCreate(BaseModel):
     title: str = Field(..., max_length=100)
