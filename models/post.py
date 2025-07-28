@@ -15,6 +15,9 @@ mapper_registry = registry()
 
 class Post(Base):
     __tablename__ = "posts"
+    __table_args__ = (
+        {"mysql_character_set": "utf8mb4", "mysql_collate": "utf8mb4_0900_as_cs"},
+    )
     id = Column(
         Integer,
         primary_key=True,
