@@ -1,10 +1,6 @@
-import os
-import sys
 from fastapi import Depends, APIRouter
 from sqlalchemy.orm import Session
 from database import get_db
-
-sys.path.insert(0, os.path.abspath(".."))
 from schemas.user import Token, UserCreate, UserLogin
 from controllers.user import create_user, login_user
 

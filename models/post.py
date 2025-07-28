@@ -2,6 +2,8 @@ from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, text
 from sqlalchemy.orm import registry
 from database import Base, engine
 
+mapper_registry = registry()
+
 
 class Post(Base):
     __tablename__ = "posts"

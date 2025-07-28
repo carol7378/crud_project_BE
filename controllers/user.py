@@ -1,17 +1,10 @@
 from fastapi import HTTPException
-from sqlalchemy import func
 from sqlalchemy.orm import Session
 from models.user import User
-
-# from models.post import Post
 from datetime import timedelta
 from helpers.auth import create_access_token
 from constants.user import ACCESS_TOKEN_EXPIRE_MINUTES, pwd_context
-
 import schemas.user as schemas
-from datetime import timedelta
-from helpers.auth import create_access_token
-from constants.user import ACCESS_TOKEN_EXPIRE_MINUTES, pwd_context
 
 
 def create_user(user: schemas.UserCreate, db: Session):

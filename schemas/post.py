@@ -1,12 +1,19 @@
 import datetime
 from fastapi import HTTPException
 from pydantic import BaseModel, Field, field_validator
+import pytz
 
 
-class Post(BaseModel):
+class PostBase(BaseModel):
     id: int
     title: str
     username: str
+    create_at: datetime.datetime
+
+
+class Post(BaseModel):
+    title: str
+    user_id: int
     content: str
     create_at: datetime.datetime
 

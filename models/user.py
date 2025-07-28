@@ -1,8 +1,8 @@
 from constants.user import pwd_context
 from database import Base, engine
-from sqlalchemy import Column, Integer, String, BINARY
-from database import Base, engine
+from sqlalchemy import Column, Integer, String
 from sqlalchemy.orm import registry
+from database import Base, engine
 from constants.user import pwd_context
 
 mapper_registry = registry()
