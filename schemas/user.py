@@ -6,7 +6,6 @@ from pydantic import BaseModel, Field, ValidationInfo, field_validator, model_va
 class TokenEncode(BaseModel):
     username: str
     id: int
-    exp: datetime.datetime = Field(default=datetime.datetime.now())
 
 
 class Token(BaseModel):
