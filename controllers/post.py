@@ -97,4 +97,4 @@ def delete_post(id: int, db: Session):
     db_post.removed_at = datetime.datetime.now()
     db.commit()
     db.refresh(db_post)
-    return db_post
+    return

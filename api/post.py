@@ -52,5 +52,5 @@ def post_update(id: int, post: PostUpdate, db: Session = Depends(get_db)):
 # 게시글 삭제
 @router.delete("/{id}")
 def post_delete(id: int, db: Session = Depends(get_db)):
-    response = delete_post(id=id, db=db)
-    return {"message": "Post deleted successfully", "contents": response}
+    delete_post(id=id, db=db)
+    return {"message": "Post deleted successfully"}
