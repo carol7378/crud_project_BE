@@ -1,7 +1,7 @@
 from sqlalchemy import create_engine
 from sqlalchemy.orm import declarative_base, sessionmaker
 
-# SQLALCHEMY_DATABASE_URL = "mysql+pymysql://soyeon:soyeon@localhost:3306/Notice_Board"
+SQLALCHEMY_DATABASE_URL = "mysql+pymysql://soyeon:soyeon@localhost:3306/Notice_Board"
 
 engine = create_engine(SQLALCHEMY_DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

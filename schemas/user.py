@@ -13,7 +13,7 @@ class Token(BaseModel):
     message: str
     access_token: str
     token_type: str
-    user_id: str
+    username: str
 
 
 class UserLogin(BaseModel):
@@ -22,10 +22,13 @@ class UserLogin(BaseModel):
 
     @model_validator(mode="before")
     @classmethod
-    def not_empty(cls, v):
-        if not v:
-            raise HTTPException(status_code=400, detail="빈 값은 허용되지 않습니다.")
-        return v
+    def not_empty(cls, values):
+        for key, value in values.items():
+            if value is None or str(value).strip() == "":
+                raise HTTPException(
+                    status_code=400, detail="빈 값은 허용되지 않습니다."
+                )
+        return values
 
 
 class UserCreate(BaseModel):

@@ -7,13 +7,4 @@ app = FastAPI()
 
 User.Base.metadata.create_all(bind=database.engine)
 
-
-def get_db():
-    db = database.SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-
 app.include_router(user.router)
