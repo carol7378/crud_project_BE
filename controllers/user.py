@@ -15,9 +15,7 @@ from constants.user import ACCESS_TOKEN_EXPIRE_MINUTES, pwd_context
 
 
 def create_user(user: schemas.UserCreate, db: Session):
-    existing_user = (
-        db.query(User).filter(func.binary(User.username) == user.username).first()
-    )
+    existing_user = db.query(User).filter(User.username == user.username).first()
     if existing_user:
         raise HTTPException(status_code=400, detail="user_id already exists")
     db_user = User(username=user.username, password=user.password, name=user.name)
