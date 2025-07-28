@@ -21,9 +21,7 @@ def create_user(user: schemas.UserCreate, db: Session):
 
 def login_user(user: schemas.UserLogin, db: Session):
     db_user = db.query(User).filter(User.username == user.username).first()
-    if not db_user:
-        raise HTTPException(status_code=400, detail="Incorrect username or password")
-    elif not pwd_context.verify(user.password, db_user.password):
+    if not db_user or not pwd_context.verify(user.password, db_user.password):
         raise HTTPException(status_code=400, detail="Incorrect username or password")
     access_token = create_access_token(
         data=schemas.TokenEncode(username=db_user.username, id=db_user.id),

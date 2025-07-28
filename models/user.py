@@ -26,7 +26,7 @@ class User(Base):
     name = Column(String(30), nullable=False, comment="사용자 실제 이름")
     password = Column(String(100), nullable=False, comment="사용자 비밀번호")
 
-    def __init__(self, username: VARBINARY, name: str, password: str):
+    def __init__(self, username: str, name: str, password: str):
         self.username = username
         self.name = name
         self.password = pwd_context.hash(password)

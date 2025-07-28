@@ -10,12 +10,12 @@ ALGORITHM = "HS256"
 
 def create_access_token(
     data: TokenEncode,
-    expires_delta: Optional[datetime.timedelta] = datetime.timedelta(minutes=15),
+    expires_delta: Optional[datetime.timedelta] = datetime.timedelta(seconds=15),
 ):
     encode_data = TokenEncode(
         username=data.username,
         id=data.id,
-        exp=datetime.datetime.now(tz=datetime.UTC) + expires_delta,
+        exp=datetime.datetime.now() + expires_delta,
     )
     encoded_jwt = jwt.encode(encode_data.__dict__, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
