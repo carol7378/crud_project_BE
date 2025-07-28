@@ -6,6 +6,7 @@ from controllers.user import create_user, login_user
 
 router = APIRouter(
     prefix="/api/users",
+    tags=["Users"],
 )
 
 

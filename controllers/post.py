@@ -8,10 +8,12 @@ from schemas.post import PostBase, PostCreate, Post, PostUpdate
 
 
 # 게시글 작성
-def create_post(post: PostCreate, db: Session):
+def create_post(post: PostCreate, token_user: str, db: Session):
     existing_user = db.query(DB_User).filter(DB_User.username == post.username).first()
     if existing_user is None:
         raise HTTPException(status_code=400, detail="username not found")
+    if token_user != existing_user.username:
+        raise HTTPException(status_code=400, detail="username not match")
     db_post = DB_Post(
         title=post.title,
         user_id=existing_user.id,
@@ -73,10 +75,13 @@ def read_posts(db: Session):
 
 
 # 게시글 수정
-def update_post(id: int, post: PostUpdate, db: Session):
+def update_post(id: int, post: PostUpdate, token_user: str, db: Session):
     db_post = db.query(DB_Post).filter(DB_Post.id == id).first()
     if db_post is None:
         raise HTTPException(status_code=400, detail="wrong post id")
+    db_user = db.query(DB_User).filter(DB_User.id == db_post.user_id).first()
+    if token_user != db_user.username:
+        raise HTTPException(status_code=400, detail="username not match")
     if db_post.removed_at is not None:
         raise HTTPException(status_code=404, detail="Post has been removed")
     db_post.title = post.title
@@ -88,11 +93,15 @@ def update_post(id: int, post: PostUpdate, db: Session):
 
 
 # 게시글 삭제
-def delete_post(id: int, db: Session):
+def delete_post(id: int, token_user: str, db: Session):
     db_post = db.query(DB_Post).filter(DB_Post.id == id).first()
     if db_post is None:
         raise HTTPException(status_code=404, detail="wrong post id")
-    elif db_post.removed_at is not None:
+
+    db_user = db.query(DB_User).filter(DB_User.id == db_post.user_id).first()
+    if token_user != db_user.username:
+        raise HTTPException(status_code=400, detail="username not match")
+    if db_post.removed_at is not None:
         raise HTTPException(status_code=404, detail="already deleted post")
     db_post.removed_at = datetime.datetime.now()
     db.commit()

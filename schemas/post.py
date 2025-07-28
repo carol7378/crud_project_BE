@@ -12,8 +12,9 @@ class PostBase(BaseModel):
 
 
 class Post(BaseModel):
+    id: int
     title: str
-    user_id: int
+    username: str
     content: str
     create_at: datetime.datetime
 

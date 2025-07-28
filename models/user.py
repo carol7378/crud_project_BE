@@ -32,6 +32,3 @@ class User(Base):
         self.username = username
         self.name = name
         self.password = pwd_context.hash(password)
-
-
-Base.metadata.create_all(engine)

@@ -1,7 +1,5 @@
 from fastapi import FastAPI
-import models.post as Post
-import models.user as User
-import database
+from database import Base, engine
 from api import user, post
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -17,8 +15,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-User.Base.metadata.create_all(bind=database.engine)
-Post.Base.metadata.create_all(bind=database.engine)
-
 app.include_router(user.router)
 app.include_router(post.router)
+Base.metadata.create_all(bind=engine)
