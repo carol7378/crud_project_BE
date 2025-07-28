@@ -1,33 +1,45 @@
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, text
 from sqlalchemy.orm import registry
-from database import Base, engine
+from sqlalchemy import create_engine
+from sqlalchemy.orm import declarative_base, sessionmaker
+
+SQLALCHEMY_DATABASE_URL = "mysql+pymysql://soyeon:soyeon@localhost:3306/Notice_Board"
+
+engine = create_engine(SQLALCHEMY_DATABASE_URL)
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
+Base = declarative_base()
 
 mapper_registry = registry()
-
-"""
-# 컬럼 설명
-    id = 각 게시물을 구별하기 위한 ID
-    title = 게시물 제목
-    username = 게시물 작성자
-    content = 게시물 내용
-    create_at = 게시물이 업로드된 시각
-    removed_at = 게시물이 삭제된 시각 (삭제되지 않은 게시물은 Null)
-
-"""
 
 
 class Post(Base):
     __tablename__ = "posts"
-    id = Column(Integer, primary_key=True, autoincrement=True)
-    title = Column(String(100), nullable=False)
+    id = Column(
+        Integer,
+        primary_key=True,
+        autoincrement=True,
+        comment="각 게시물을 구별하기 위한 ID",
+    )
+    title = Column(String(100), nullable=False, comment="게시물 제목")
     user_id = Column(
-        Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False
+        Integer,
+        ForeignKey("users.id", ondelete="CASCADE"),
+        nullable=False,
+        comment="게시물 작성자",
     )
-    content = Column(String(300), nullable=False)
+    content = Column(String(300), nullable=False, comment="게시물 내용")
     create_at = Column(
-        DateTime, server_default=text("CURRENT_TIMESTAMP"), nullable=False
+        DateTime,
+        server_default=text("CURRENT_TIMESTAMP"),
+        nullable=False,
+        comment="게시물이 업로드된 시각",
     )
-    removed_at = Column(DateTime, nullable=True)
+    removed_at = Column(
+        DateTime,
+        nullable=True,
+        comment="게시물이 삭제된 시각 (삭제되지 않은 게시물은 Null)",
+    )
 
 
 Base.metadata.create_all(engine)
