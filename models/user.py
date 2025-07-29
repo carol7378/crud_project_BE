@@ -1,11 +1,7 @@
 from constants.user import pwd_context
-from database import Base, engine
+from database import Base
 from sqlalchemy import Column, Integer, String
-from sqlalchemy.orm import registry
-from database import Base, engine
-from constants.user import pwd_context
-
-mapper_registry = registry()
+from sqlalchemy.orm import relationship
 
 
 class User(Base):
@@ -27,6 +23,7 @@ class User(Base):
     )
     name = Column(String(30), nullable=False, comment="사용자 실제 이름")
     password = Column(String(100), nullable=False, comment="사용자 비밀번호")
+    post = relationship("Post", back_populates="user")
 
     def __init__(self, username: str, name: str, password: str):
         self.username = username

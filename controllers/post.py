@@ -26,18 +26,13 @@ def create_post(post: PostCreate, token_user: str, db: Session):
 
 # 게시글 1건 조회
 def read_post(id: int, db: Session):
-    db_post = db.execute(
-        select(DB_Post, DB_User).join(DB_User, DB_User.id == DB_Post.user_id)
-    ).first()
+    db_post = db.query(DB_Post).filter(DB_Post.id == id).first()
     if db_post is None:
         raise HTTPException(status_code=404, detail="Post not found")
-    # db_username = (
-    #     db.query(DB_User).filter(DB_User.id == db_post.user_id).first().username
-    # )
     return Post(
         id=db_post.id,
         title=db_post.title,
-        username=db_post.username,
+        username=db_post.user.username,
         content=db_post.content,
         create_at=db_post.create_at,
     )
@@ -45,21 +40,16 @@ def read_post(id: int, db: Session):
 
 # 게시글 리스트 조회
 def read_posts(db: Session):
-    db_post = db.query(DB_Post).filter(DB_Post.removed_at == None).all()
-    all_post = []
-
-    for posts in db_post:
-        db_username = (
-            db.query(DB_User).filter(DB_User.id == posts.user_id).first().username
+    posts = db.query(DB_Post).filter(DB_Post.removed_at == None).all()
+    all_post = [
+        PostBase(
+            id=post.id,
+            title=post.title,
+            username=post.user.username,
+            create_at=post.create_at,
         )
-        all_post.append(
-            PostBase(
-                id=posts.id,
-                title=posts.title,
-                username=db_username,
-                create_at=posts.create_at,
-            )
-        )
+        for post in posts
+    ]
     all_post = sorted(all_post, key=lambda post: post.create_at)
     all_post.reverse()
     return all_post
@@ -70,8 +60,7 @@ def update_post(id: int, post: PostUpdate, token_user: str, db: Session):
     db_post = db.query(DB_Post).filter(DB_Post.id == id).first()
     if db_post is None:
         raise HTTPException(status_code=400, detail="wrong post id")
-    db_user = db.query(DB_User).filter(DB_User.id == db_post.user_id).first()
-    if token_user != db_user.username:
+    if token_user != db_post.user.username:
         raise HTTPException(status_code=400, detail="username not match")
     if db_post.removed_at is not None:
         raise HTTPException(status_code=404, detail="Post has been removed")
@@ -84,7 +73,7 @@ def update_post(id: int, post: PostUpdate, token_user: str, db: Session):
         id=db_post.id,
         title=db_post.title,
         content=db_post.content,
-        username=db_user,
+        username=db_post.user.username,
         create_at=db_post.create_at,
     )
 

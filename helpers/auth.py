@@ -44,5 +44,7 @@ def decode_jwt_token(token: str, db: Session):
         raise HTTPException(status_code=400, detail="옳지 않은 토큰입니다.")
 
 
-def verify_header(Authorization: str = Header()):
+def verify_header(Authorization: Optional[str] = Header(None)):
+    if Authorization is None:
+        raise HTTPException(status_code=400, detail="Authorization Error")
     return Authorization

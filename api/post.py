@@ -1,7 +1,7 @@
-from typing import Annotated
+from typing import Annotated, Optional
 from fastapi.security import APIKeyHeader
 from sqlalchemy.orm import Session
-from fastapi import APIRouter, Depends, Header
+from fastapi import APIRouter, Depends, Header, Request
 from controllers.post import (
     create_post,
     read_post,
@@ -67,7 +67,7 @@ def update_post_api(
     db: Session = Depends(get_db),
 ):
     user = decode_jwt_token(token, db)
-    response = update_post(id=id, post=post, token_user=user.username, db=db)
+    response = update_post(id=id, post=post, token_user=user["username"], db=db)
     return {
         "message": "Post updated successfully with id " + str(id),
         "contents": response,
@@ -82,5 +82,5 @@ def delete_post_api(
     db: Session = Depends(get_db),
 ):
     user = decode_jwt_token(token, db)
-    delete_post(id=id, token_user=user.username, db=db)
+    delete_post(id=id, token_user=user["username"], db=db)
     return {"message": "Post deleted successfully"}

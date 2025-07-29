@@ -1,8 +1,6 @@
 from sqlalchemy import Column, DateTime, ForeignKey, Integer, String, text
-from sqlalchemy.orm import registry
-from database import Base, engine
-
-mapper_registry = registry()
+from sqlalchemy.orm import relationship
+from database import Base
 
 
 class Post(Base):
@@ -35,3 +33,4 @@ class Post(Base):
         nullable=True,
         comment="게시물이 삭제된 시각 (삭제되지 않은 게시물은 Null)",
     )
+    user = relationship("User", back_populates="post")
