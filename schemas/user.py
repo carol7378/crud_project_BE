@@ -11,10 +11,10 @@ class TokenEncode(BaseModel):
 
 
 class Token(BaseModel):
-    message: str
     access_token: str
     token_type: str
     username: str
+    message: str
 
 
 class UserLogin(BaseModel):

@@ -11,24 +11,23 @@ from controllers.post import (
 )
 from database import get_db
 from schemas.post import PostCreate, PostUpdate
-from helpers.auth import decode_jwt_token
+from helpers.auth import decode_jwt_token, verify_header
 from schemas.user import Token
 
 router = APIRouter(
     prefix="/api/posts",
     tags=["Posts"],
 )
-api_key_header = APIKeyHeader(name="Token")
 
 
 @router.post("/")
-def post_create(
+def create_post_api(
     post: PostCreate,
-    Token: str | None = Header(default=None),
+    token: Annotated[str, Depends(verify_header)],
     db: Session = Depends(get_db),
 ):
-    payload = decode_jwt_token(Token)
-    response = create_post(db=db, token_user=payload["username"], post=post)
+    user = decode_jwt_token(token, db)
+    response = create_post(db=db, token_user=user["username"], post=post)
     return {
         "message": "Post created successfully [ " + post.title + " ]",
         "contents": response,
@@ -36,22 +35,22 @@ def post_create(
 
 
 @router.get("/")
-def posts_read(
-    Token: str | None = Header(default=None),
+def read_posts_api(
+    token: Annotated[str, Depends(verify_header)],
     db: Session = Depends(get_db),
 ):
-    decode_jwt_token(Token)
+    decode_jwt_token(token, db)
     response = read_posts(db=db)
     return {"message": "Posts retrieved successfully", "contents": response}
 
 
 @router.get("/{id}")
-def post_read(
+def read_post_api(
     id: int,
-    Token: str | None = Header(default=None),
+    token: Annotated[str, Depends(verify_header)],
     db: Session = Depends(get_db),
 ):
-    payload = decode_jwt_token(Token)
+    decode_jwt_token(token, db)
     response = read_post(id=id, db=db)
     return {
         "message": "Post read successfully with id " + str(id),
@@ -61,14 +60,14 @@ def post_read(
 
 # 게시글 수정
 @router.put("/{id}")
-def post_update(
+def update_post_api(
     id: int,
     post: PostUpdate,
-    Token: str | None = Header(default=None),
+    token: Annotated[str, Depends(verify_header)],
     db: Session = Depends(get_db),
 ):
-    payload = decode_jwt_token(Token)
-    response = update_post(id=id, post=post, token_user=payload["username"], db=db)
+    user = decode_jwt_token(token, db)
+    response = update_post(id=id, post=post, token_user=user.username, db=db)
     return {
         "message": "Post updated successfully with id " + str(id),
         "contents": response,
@@ -77,11 +76,11 @@ def post_update(
 
 # 게시글 삭제
 @router.delete("/{id}")
-def post_delete(
+def delete_post_api(
     id: int,
-    Token: str | None = Header(default=None),
+    token: Annotated[str, Depends(verify_header)],
     db: Session = Depends(get_db),
 ):
-    payload = decode_jwt_token(Token)
-    delete_post(id=id, token_user=payload["username"], db=db)
+    user = decode_jwt_token(token, db)
+    delete_post(id=id, token_user=user.username, db=db)
     return {"message": "Post deleted successfully"}

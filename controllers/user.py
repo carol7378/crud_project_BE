@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from models.user import User
 from datetime import timedelta
 from helpers.auth import create_access_token
-from constants.user import ACCESS_TOKEN_EXPIRE_MINUTES, pwd_context
+from constants.user import pwd_context
 import schemas.user as schemas
 
 
@@ -22,8 +22,7 @@ def login_user(user: schemas.UserLogin, db: Session):
         raise HTTPException(status_code=400, detail="Incorrect username or password")
 
     access_token = create_access_token(
-        data=schemas.TokenEncode(username=db_user.username, id=db_user.id),
-        expires_delta=timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES),
+        data=schemas.TokenEncode(username=db_user.username, id=db_user.id)
     )
     return {
         "access_token": access_token,

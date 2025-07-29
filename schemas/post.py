@@ -12,11 +12,11 @@ class PostBase(BaseModel):
 
 
 class Post(BaseModel):
-    id: int
-    title: str
-    username: str
-    content: str
-    create_at: datetime.datetime
+    id: int = Field(..., description="게시글에 대한 id")
+    title: str = Field(..., description="게시글 제목")
+    username: str = Field(..., description="작성자의 닉네임")
+    content: str = Field(..., description="게시글 본문")
+    create_at: datetime.datetime = Field(..., description="게시글 생성시간")
 
 
 class PostUpdate(BaseModel):
