@@ -30,7 +30,7 @@ def post_create(
     payload = decode_jwt_token(Token)
     response = create_post(db=db, token_user=payload["username"], post=post)
     return {
-        "message": "Post created successfully [ " + post_create.title + " ]",
+        "message": "Post created successfully [ " + post.title + " ]",
         "contents": response,
     }
 
