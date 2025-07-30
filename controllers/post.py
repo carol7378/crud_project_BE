@@ -69,7 +69,7 @@ def read_posts(db: Session):
 # 게시글 수정
 def update_post(id: int, post: PostUpdate, user: DB_User, db: Session):
     db_post = (
-        db.query(DB_Post).filter(DB_Post.id == id, DB_Post.removed_at == None).first()
+        db.query(DB_Post).filter(DB_Post.id == id, DB_Post.removed_at.is_(None)).first()
     )
     if db_post is None:
         raise HTTPException(status_code=400, detail="wrong post id")
@@ -84,11 +84,12 @@ def update_post(id: int, post: PostUpdate, user: DB_User, db: Session):
 # 게시글 삭제
 def delete_post(id: int, user: DB_User, db: Session):
     db_post = (
-        db.query(DB_Post).filter(DB_Post.id == id, DB_Post.removed_at == None).first()
+        db.query(DB_Post).filter(DB_Post.id == id, DB_Post.removed_at.is_(None)).first()
     )
     if db_post is None:
         raise HTTPException(status_code=400, detail="wrong post id")
     if db_post.user_id != user.id:
         raise HTTPException(status_code=401, detail="username not match")
+    db_post.removed_at = datetime.datetime.now(pytz.timezone("Asia/Seoul"))
     db.commit()
     return {"success": True}
