@@ -23,36 +23,40 @@ def create_post(post: PostCreate, user: DB_User, db: Session):
 
 # 게시글 1건 조회
 def read_post(id: int, db: Session):
-    db_post = (
-        db.query(DB_Post).filter(DB_Post.id == id, DB_Post.removed_at.is_(None)).first()
-    )
+    db_post = db.execute(
+        select(DB_Post, DB_User.username)
+        .filter(DB_Post.id == id, DB_Post.removed_at.is_(None))
+        .outerjoin(DB_Post, DB_Post.user_id == DB_User.id)
+    ).first()
+
     if db_post is None:
         raise HTTPException(status_code=404, detail="Post not found")
     return Post(
-        id=db_post.id,
-        title=db_post.title,
-        username=db_post.user.username,
-        content=db_post.content,
-        create_at=db_post.create_at,
+        id=db_post[0].id,
+        title=db_post[0].title,
+        username=db_post[1],
+        content=db_post[0].content,
+        create_at=db_post[0].create_at,
     )
 
 
 # 게시글 리스트 조회
 def read_posts(db: Session):
-    posts = (
-        db.query(DB_Post)
-        .filter(DB_Post.removed_at == None)
+    stmt = (
+        select(DB_Post.id, DB_Post.title, DB_User.username, DB_Post.create_at)
+        .join(DB_Post, DB_User.id == DB_Post.user_id)
+        .filter(DB_Post.removed_at.is_(None))
         .order_by(DB_Post.create_at.desc())
-        .all()
     )
+    posts = db.execute(stmt).all()
     all_post = [
         PostBase(
-            id=post.id,
-            title=post.title,
-            username=post.user.username,
-            create_at=post.create_at,
+            id=id,
+            title=title,
+            username=username,
+            create_at=create_at,
         )
-        for post in posts
+        for id, title, username, create_at in posts
     ]
     return all_post
 
