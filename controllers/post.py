@@ -27,7 +27,9 @@ def create_post(post: PostCreate, token_user: str, db: Session):
 
 # 게시글 1건 조회
 def read_post(id: int, db: Session):
-    db_post = db.query(DB_Post).filter(DB_Post.id == id).first()
+    db_post = (
+        db.query(DB_Post).filter(DB_Post.id == id, DB_Post.removed_at == None).first()
+    )
     if db_post is None:
         raise HTTPException(status_code=404, detail="Post not found")
     return Post(
