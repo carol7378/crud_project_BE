@@ -5,6 +5,7 @@ from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.orm import Session
 import jwt
 import pytz
+from database import get_db
 from models.user import User
 from schemas.user import TokenEncode
 
@@ -24,27 +25,26 @@ def create_access_token(
         "id": data.id,
         "exp": datetime.datetime.now(pytz.timezone("Asia/Seoul")) + expires_delta,
     }
-    encoded_jwt = jwt.encode(encode_data, SECRET_KEY, algorithm=ALGORITHM)
+    encoded_jwt = "Bearer " + jwt.encode(encode_data, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
 
-def decode_jwt_token(token: str, db: Session):
+def decode_jwt_token(
+    Authorization: Optional[str] = Header(None), db: Session = Depends(get_db)
+):
     try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=ALGORITHM)
+        Authorization = Authorization.split()[1]
+        if Authorization is None:
+            raise HTTPException(status_code=401, detail="Authorization Error")
+        payload = jwt.decode(Authorization, SECRET_KEY, algorithms=ALGORITHM)
         username: str = payload.get("username")
         if username is None:
             raise HTTPException(status_code=400, detail="잘못된 토큰입니다.")
         user = db.query(User).filter(User.username == username).first()
         if user is None:
             raise HTTPException(status_code=400, detail="사용자를 찾을 수 없습니다")
-        return payload
+        return user
     except jwt.ExpiredSignatureError as e:
         raise HTTPException(status_code=401, detail="토큰이 만료되었습니다.")
     except jwt.InvalidTokenError as e:
         raise HTTPException(status_code=401, detail="옳지 않은 토큰입니다.")
-
-
-def verify_header(Authorization: Optional[str] = Header(None)):
-    if Authorization is None:
-        raise HTTPException(status_code=401, detail="Authorization Error")
-    return Authorization

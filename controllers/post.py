@@ -9,16 +9,10 @@ from schemas.post import PostBase, PostCreate, Post, PostUpdate
 
 
 # 게시글 작성
-def create_post(post: PostCreate, token_user: str, db: Session):
-    existing_user = db.query(DB_User).filter(DB_User.username == post.username).first()
-    if existing_user is None:
-        raise HTTPException(status_code=404, detail="username not found")
-    if token_user != existing_user.username:
-        # 권한 없음
-        raise HTTPException(status_code=401, detail="username not match")
+def create_post(post: PostCreate, user: DB_User, db: Session):
     db_post = DB_Post(
         title=post.title,
-        user_id=existing_user.id,
+        user_id=user.id,
         content=post.content,
     )
     db.add(db_post)
@@ -61,14 +55,13 @@ def read_posts(db: Session):
 
 
 # 게시글 수정
-def update_post(id: int, post: PostUpdate, token_user: str, db: Session):
+def update_post(id: int, post: PostUpdate, user: DB_User, db: Session):
     db_post = (
         db.query(DB_Post).filter(DB_Post.id == id, DB_Post.removed_at == None).first()
     )
     if db_post is None:
         raise HTTPException(status_code=400, detail="wrong post id")
-    if token_user != db_post.user.username:
-        # 권한 없음
+    if db_post.user_id != user.id:
         raise HTTPException(status_code=401, detail="username not match")
     db_post.title = post.title
     db_post.content = post.content
@@ -79,21 +72,19 @@ def update_post(id: int, post: PostUpdate, token_user: str, db: Session):
         id=db_post.id,
         title=db_post.title,
         content=db_post.content,
-        username=db_post.user.username,
+        username=user.username,
         create_at=db_post.create_at,
     )
 
 
 # 게시글 삭제
-def delete_post(id: int, token_user: str, db: Session):
+def delete_post(id: int, user: DB_User, db: Session):
     db_post = (
         db.query(DB_Post).filter(DB_Post.id == id, DB_Post.removed_at == None).first()
     )
     if db_post is None:
         raise HTTPException(status_code=400, detail="wrong post id")
-
-    db_user = db.query(DB_User).filter(DB_User.id == db_post.user_id).first()
-    if token_user != db_user.username:
+    if db_post.user_id != user.id:
         raise HTTPException(status_code=401, detail="username not match")
     db_post.removed_at = datetime.datetime.now()
     db.commit()

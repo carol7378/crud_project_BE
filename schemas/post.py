@@ -33,10 +33,9 @@ class PostUpdate(BaseModel):
 
 class PostCreate(BaseModel):
     title: str = Field(..., max_length=100)
-    username: str
     content: str = Field(..., max_length=300)
 
-    @field_validator("username", "title", "content", mode="before")
+    @field_validator("title", "content", mode="before")
     @classmethod
     def not_empty(cls, v):
         if not v:
