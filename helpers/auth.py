@@ -39,12 +39,14 @@ def decode_jwt_token(token: str, db: Session):
             raise HTTPException(status_code=400, detail="사용자를 찾을 수 없습니다")
         return payload
     except jwt.ExpiredSignatureError as e:
-        raise HTTPException(status_code=400, detail="토큰이 만료되었습니다.")
+        raise HTTPException(status_code=401, detail="토큰이 만료되었습니다.")
     except jwt.InvalidTokenError as e:
-        raise HTTPException(status_code=400, detail="옳지 않은 토큰입니다.")
+        raise HTTPException(status_code=401, detail="옳지 않은 토큰입니다.")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail="Server Error [ " + e + " ]")
 
 
 def verify_header(Authorization: Optional[str] = Header(None)):
     if Authorization is None:
-        raise HTTPException(status_code=400, detail="Authorization Error")
+        raise HTTPException(status_code=401, detail="Authorization Error")
     return Authorization
