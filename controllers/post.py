@@ -71,13 +71,11 @@ def read_posts(db: Session):
 def update_post(id: int, post: PostUpdate, token_user: str, db: Session):
     try:
         db_post = db.query(DB_Post).filter(DB_Post.id == id).first()
-        if db_post is None:
+        if db_post is None or db_post.removed_at is not None:
             raise HTTPException(status_code=400, detail="wrong post id")
         if token_user != db_post.user.username:
             # 권한 없음
             raise HTTPException(status_code=401, detail="username not match")
-        if db_post.removed_at is not None:
-            raise HTTPException(status_code=404, detail="Post has been removed")
         db_post.title = post.title
         db_post.content = post.content
         db_post.create_at = datetime.datetime.now(pytz.timezone("Asia/Seoul"))
@@ -98,14 +96,12 @@ def update_post(id: int, post: PostUpdate, token_user: str, db: Session):
 def delete_post(id: int, token_user: str, db: Session):
     try:
         db_post = db.query(DB_Post).filter(DB_Post.id == id).first()
-        if db_post is None:
+        if db_post is None or db_post.removed_at is not None:
             raise HTTPException(status_code=400, detail="wrong post id")
 
         db_user = db.query(DB_User).filter(DB_User.id == db_post.user_id).first()
         if token_user != db_user.username:
             raise HTTPException(status_code=401, detail="username not match")
-        if db_post.removed_at is not None:
-            raise HTTPException(status_code=404, detail="already deleted post")
         db_post.removed_at = datetime.datetime.now()
         db.commit()
         db.refresh(db_post)
