@@ -13,7 +13,7 @@ router = APIRouter(
 @router.post("/")
 def user_create(user_create: UserCreate, db: Session = Depends(get_db)):
     create_user(db=db, user=user_create)
-    return
+    return {"success": True}
 
 
 @router.post("/login", response_model=Token)

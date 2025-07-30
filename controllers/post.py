@@ -17,26 +17,31 @@ def create_post(post: PostCreate, user: DB_User, db: Session):
     )
     db.add(db_post)
     db.commit()
-    db.refresh(db_post)
-    return {"success": True}
+    return {"success": True, "post_id": db_post.id}
 
 
 # 게시글 1건 조회
 def read_post(id: int, db: Session):
     db_post = db.execute(
-        select(DB_Post, DB_User.username)
+        select(
+            DB_Post.id,
+            DB_Post.title,
+            DB_Post.content,
+            DB_Post.create_at,
+            DB_User.username,
+        )
         .filter(DB_Post.id == id, DB_Post.removed_at.is_(None))
-        .outerjoin(DB_Post, DB_Post.user_id == DB_User.id)
+        .join(DB_Post, DB_Post.user_id == DB_User.id)
     ).first()
 
     if db_post is None:
         raise HTTPException(status_code=404, detail="Post not found")
     return Post(
-        id=db_post[0].id,
-        title=db_post[0].title,
-        username=db_post[1],
-        content=db_post[0].content,
-        create_at=db_post[0].create_at,
+        id=db_post.id,
+        title=db_post.title,
+        username=db_post.username,
+        content=db_post.content,
+        create_at=db_post.create_at.strftime("%Y-%m-%d %H:%M:%S"),
     )
 
 
@@ -54,7 +59,7 @@ def read_posts(db: Session):
             id=id,
             title=title,
             username=username,
-            create_at=create_at,
+            create_at=create_at.strftime("%Y-%m-%d %H:%M:%S"),
         )
         for id, title, username, create_at in posts
     ]
@@ -72,9 +77,7 @@ def update_post(id: int, post: PostUpdate, user: DB_User, db: Session):
         raise HTTPException(status_code=401, detail="username not match")
     db_post.title = post.title
     db_post.content = post.content
-    db_post.create_at = datetime.datetime.now(pytz.timezone("Asia/Seoul"))
     db.commit()
-    db.refresh(db_post)
     return {"success": True}
 
 
@@ -87,7 +90,5 @@ def delete_post(id: int, user: DB_User, db: Session):
         raise HTTPException(status_code=400, detail="wrong post id")
     if db_post.user_id != user.id:
         raise HTTPException(status_code=401, detail="username not match")
-    db_post.removed_at = datetime.datetime.now()
     db.commit()
-    db.refresh(db_post)
     return {"success": True}
