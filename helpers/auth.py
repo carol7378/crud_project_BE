@@ -42,8 +42,6 @@ def decode_jwt_token(token: str, db: Session):
         raise HTTPException(status_code=401, detail="토큰이 만료되었습니다.")
     except jwt.InvalidTokenError as e:
         raise HTTPException(status_code=401, detail="옳지 않은 토큰입니다.")
-    except Exception as e:
-        raise HTTPException(status_code=500, detail="Server Error [ " + e + " ]")
 
 
 def verify_header(Authorization: Optional[str] = Header(None)):
