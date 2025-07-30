@@ -15,11 +15,7 @@ from schemas.post import PostCreate, PostUpdate
 from helpers.auth import decode_jwt_token
 from schemas.user import Token
 
-auth_header = APIKeyHeader(name="Authorization", auto_error=False)
-
-router = APIRouter(
-    prefix="/api/posts", tags=["Posts"], dependencies=[Depends(auth_header)]
-)
+router = APIRouter(prefix="/api/posts", tags=["Posts"])
 
 
 @router.post("/")

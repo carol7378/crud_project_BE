@@ -1,7 +1,7 @@
 import datetime
 from typing import Optional
 from fastapi import Depends, HTTPException, Header
-from fastapi.security import HTTPAuthorizationCredentials, HTTPBearer
+from fastapi.security import APIKeyHeader, HTTPAuthorizationCredentials, HTTPBearer
 from sqlalchemy.orm import Session
 import jwt
 import pytz
@@ -12,6 +12,8 @@ from schemas.user import TokenEncode
 SECRET_KEY = "SECRET_KEY"
 ALGORITHM = "HS256"
 from constants.user import ACCESS_TOKEN_EXPIRE_MINUTES
+
+auth_header = APIKeyHeader(name="Authorization", auto_error=False)
 
 
 def create_access_token(
@@ -30,7 +32,7 @@ def create_access_token(
 
 
 def decode_jwt_token(
-    Authorization: Optional[str] = Header(None), db: Session = Depends(get_db)
+    Authorization: str = Depends(auth_header), db: Session = Depends(get_db)
 ):
     try:
         if Authorization is None or Authorization.split()[0] != "Bearer":
