@@ -33,4 +33,4 @@ class Post(Base):
         nullable=True,
         comment="게시물이 삭제된 시각 (삭제되지 않은 게시물은 Null)",
     )
-    user = relationship("User", back_populates="post")
+    user = relationship("User", foreign_keys=[user_id])

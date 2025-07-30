@@ -15,9 +15,10 @@ from schemas.post import PostCreate, PostUpdate
 from helpers.auth import decode_jwt_token
 from schemas.user import Token
 
+auth_header = APIKeyHeader(name="Authorization", auto_error=False)
+
 router = APIRouter(
-    prefix="/api/posts",
-    tags=["Posts"],
+    prefix="/api/posts", tags=["Posts"], dependencies=[Depends(auth_header)]
 )
 
 
@@ -28,10 +29,7 @@ def create_post_api(
     db: Annotated[Session, Depends(get_db)],
 ):
     response = create_post(db=db, user=user, post=post)
-    return {
-        "message": "Post created successfully [ " + post.title + " ]",
-        "contents": response,
-    }
+    return response
 
 
 @router.get("/")
@@ -40,7 +38,7 @@ def read_posts_api(
     db: Session = Depends(get_db),
 ):
     response = read_posts(db=db)
-    return {"message": "Posts retrieved successfully", "contents": response}
+    return response
 
 
 @router.get("/{id}")
@@ -50,10 +48,7 @@ def read_post_api(
     db: Session = Depends(get_db),
 ):
     response = read_post(id=id, db=db)
-    return {
-        "message": "Post read successfully with id " + str(id),
-        "contents": response,
-    }
+    return response
 
 
 # 게시글 수정
@@ -65,10 +60,8 @@ def update_post_api(
     db: Session = Depends(get_db),
 ):
     response = update_post(id=id, post=post, user=user, db=db)
-    return {
-        "message": "Post updated successfully with id " + str(id),
-        "contents": response,
-    }
+    response["id"] = id
+    return response
 
 
 # 게시글 삭제
@@ -79,4 +72,4 @@ def delete_post_api(
     db: Session = Depends(get_db),
 ):
     delete_post(id=id, user=user, db=db)
-    return {"message": "Post deleted successfully"}
+    return

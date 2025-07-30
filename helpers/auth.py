@@ -25,7 +25,7 @@ def create_access_token(
         "id": data.id,
         "exp": datetime.datetime.now(pytz.timezone("Asia/Seoul")) + expires_delta,
     }
-    encoded_jwt = "Bearer " + jwt.encode(encode_data, SECRET_KEY, algorithm=ALGORITHM)
+    encoded_jwt = jwt.encode(encode_data, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
 
@@ -33,10 +33,10 @@ def decode_jwt_token(
     Authorization: Optional[str] = Header(None), db: Session = Depends(get_db)
 ):
     try:
-        Authorization = Authorization.split()[1]
-        if Authorization is None:
+        if Authorization is None or Authorization.split()[0] != "Bearer":
             raise HTTPException(status_code=401, detail="Authorization Error")
-        payload = jwt.decode(Authorization, SECRET_KEY, algorithms=ALGORITHM)
+        token = Authorization.split()[1]
+        payload = jwt.decode(token, SECRET_KEY, algorithms=ALGORITHM)
         username: str = payload.get("username")
         if username is None:
             raise HTTPException(status_code=400, detail="잘못된 토큰입니다.")

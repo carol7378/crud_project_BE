@@ -14,7 +14,6 @@ class Token(BaseModel):
     access_token: str
     token_type: str
     username: str
-    message: str
 
 
 class UserLogin(BaseModel):
