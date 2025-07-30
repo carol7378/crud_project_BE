@@ -60,7 +60,6 @@ def update_post_api(
     db: Session = Depends(get_db),
 ):
     response = update_post(id=id, post=post, user=user, db=db)
-    response["id"] = id
     return response
 
 
@@ -71,5 +70,5 @@ def delete_post_api(
     user: Annotated[User, Depends(decode_jwt_token)],
     db: Session = Depends(get_db),
 ):
-    delete_post(id=id, user=user, db=db)
-    return
+    response = delete_post(id=id, user=user, db=db)
+    return response

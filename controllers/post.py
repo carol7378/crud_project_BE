@@ -24,7 +24,7 @@ def create_post(post: PostCreate, user: DB_User, db: Session):
 # 게시글 1건 조회
 def read_post(id: int, db: Session):
     db_post = (
-        db.query(DB_Post).filter(DB_Post.id == id, DB_Post.removed_at == None).first()
+        db.query(DB_Post).filter(DB_Post.id == id, DB_Post.removed_at.is_(None)).first()
     )
     if db_post is None:
         raise HTTPException(status_code=404, detail="Post not found")
@@ -39,7 +39,12 @@ def read_post(id: int, db: Session):
 
 # 게시글 리스트 조회
 def read_posts(db: Session):
-    posts = db.query(DB_Post).filter(DB_Post.removed_at == None).all()
+    posts = (
+        db.query(DB_Post)
+        .filter(DB_Post.removed_at == None)
+        .order_by(DB_Post.create_at.desc())
+        .all()
+    )
     all_post = [
         PostBase(
             id=post.id,
@@ -49,8 +54,6 @@ def read_posts(db: Session):
         )
         for post in posts
     ]
-    all_post = sorted(all_post, key=lambda post: post.create_at)
-    all_post.reverse()
     return all_post
 
 
@@ -68,13 +71,7 @@ def update_post(id: int, post: PostUpdate, user: DB_User, db: Session):
     db_post.create_at = datetime.datetime.now(pytz.timezone("Asia/Seoul"))
     db.commit()
     db.refresh(db_post)
-    return Post(
-        id=db_post.id,
-        title=db_post.title,
-        content=db_post.content,
-        username=user.username,
-        create_at=db_post.create_at,
-    )
+    return {"success": True}
 
 
 # 게시글 삭제
@@ -89,4 +86,4 @@ def delete_post(id: int, user: DB_User, db: Session):
     db_post.removed_at = datetime.datetime.now()
     db.commit()
     db.refresh(db_post)
-    return
+    return {"success": True}

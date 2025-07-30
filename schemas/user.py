@@ -6,19 +6,19 @@ from pydantic import BaseModel, Field, field_validator, model_validator
 
 
 class TokenEncode(BaseModel):
-    username: str
-    id: int
+    username: str = Field(..., description="토큰 내 username")
+    id: int = Field(..., description="토큰 내 user 의 id")
 
 
 class Token(BaseModel):
-    access_token: str
-    token_type: str
-    username: str
+    access_token: str = Field(..., description="토큰")
+    token_type: str = Field(..., description="Bearer")
+    username: str = Field(..., description="토큰이 할당된 유저의 username")
 
 
 class UserLogin(BaseModel):
-    username: str
-    password: str
+    username: str = Field(..., description="사용자의 닉네임")
+    password: str = Field(..., description="사용자의 비밀번호")
 
     @model_validator(mode="before")
     @classmethod
@@ -33,7 +33,7 @@ class UserLogin(BaseModel):
 
 class UserCreate(BaseModel):
     username: str = Field(..., description="사용자의 닉네임")
-    password: str
+    password: str = Field(..., description="사용자의 비밀번호")
     password_check: str = Field(..., description="작성한 비밀번호를 다시 입력")
     name: str = Field(..., description="사용자의 실제 이름")
 

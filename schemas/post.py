@@ -5,10 +5,10 @@ import pytz
 
 
 class PostBase(BaseModel):
-    id: int
-    title: str
-    username: str
-    create_at: datetime.datetime
+    id: int = Field(..., description="게시글에 대한 id")
+    title: str = Field(..., description="게시글 제목")
+    username: str = Field(..., description="작성자의 닉네임")
+    create_at: datetime.datetime = Field(..., description="게시글 생성시간")
 
 
 class Post(BaseModel):
@@ -20,8 +20,8 @@ class Post(BaseModel):
 
 
 class PostUpdate(BaseModel):
-    title: str
-    content: str
+    title: str = Field(..., description="게시글 제목")
+    content: str = Field(..., description="게시글 본문")
 
     @field_validator("title", "content", mode="before")
     @classmethod
@@ -32,8 +32,8 @@ class PostUpdate(BaseModel):
 
 
 class PostCreate(BaseModel):
-    title: str = Field(..., max_length=100)
-    content: str = Field(..., max_length=300)
+    title: str = Field(..., description="게시글 제목", max_length=100)
+    content: str = Field(..., description="게시글 본문", max_length=300)
 
     @field_validator("title", "content", mode="before")
     @classmethod
