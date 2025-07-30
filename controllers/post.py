@@ -70,8 +70,12 @@ def read_posts(db: Session):
 # 게시글 수정
 def update_post(id: int, post: PostUpdate, token_user: str, db: Session):
     try:
-        db_post = db.query(DB_Post).filter(DB_Post.id == id).first()
-        if db_post is None or db_post.removed_at is not None:
+        db_post = (
+            db.query(DB_Post)
+            .filter(DB_Post.id == id, DB_Post.removed_at == None)
+            .first()
+        )
+        if db_post is None:
             raise HTTPException(status_code=400, detail="wrong post id")
         if token_user != db_post.user.username:
             # 권한 없음
@@ -95,8 +99,12 @@ def update_post(id: int, post: PostUpdate, token_user: str, db: Session):
 # 게시글 삭제
 def delete_post(id: int, token_user: str, db: Session):
     try:
-        db_post = db.query(DB_Post).filter(DB_Post.id == id).first()
-        if db_post is None or db_post.removed_at is not None:
+        db_post = (
+            db.query(DB_Post)
+            .filter(DB_Post.id == id, DB_Post.removed_at == None)
+            .first()
+        )
+        if db_post is None:
             raise HTTPException(status_code=400, detail="wrong post id")
 
         db_user = db.query(DB_User).filter(DB_User.id == db_post.user_id).first()
