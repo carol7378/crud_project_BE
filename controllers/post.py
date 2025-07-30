@@ -11,6 +11,8 @@ from schemas.post import PostBase, PostCreate, Post, PostUpdate
 # 게시글 작성
 def create_post(post: PostCreate, token_user: str, db: Session):
     existing_user = db.query(DB_User).filter(DB_User.username == post.username).first()
+    if existing_user is None:
+        raise HTTPException(status_code=404, detail="username not found")
     if token_user != existing_user.username:
         # 권한 없음
         raise HTTPException(status_code=401, detail="username not match")
