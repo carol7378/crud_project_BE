@@ -17,19 +17,14 @@ def create_post(post: PostCreate_Update, user: DB_User, db: Session):
     )
     db.add(db_post)
     db.commit()
-    stmt = (
-        select(
-            DB_Post.id,
-            DB_Post.title,
-            DB_User.username,
-            DB_Post.content,
-            DB_Post.create_at,
-        )
-        .join(DB_User, DB_User.id == db_post.user_id)
-        .filter(DB_Post.id == db_post.id)
-    )
-    response = db.execute(stmt).all()
-    return response[0]
+    db.refresh
+    response = {
+        "message": "새로운 게시글이 등록되었습니다!",
+        "id": db_post.id,
+        "title": post.title,
+        "username": user.username,
+    }
+    return response
 
 
 # 게시글 리스트 조회

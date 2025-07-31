@@ -25,16 +25,9 @@ dbDep = Annotated[Session, Depends(get_db)]
 @router.post("/")
 def create_post_api(post: PostCreate_Update, user: tokenDep, db: dbDep):
     response = create_post(db=db, user=user, post=post)
-    slackUrl = "https://hooks.slack.com/triggers/~"
-    data = {
-        "id": response[0],
-        "title": response[1],
-        "username": response[2],
-        "content": response[3],
-        "create_at": response[4].strftime("%Y-%m-%d %H:%M:%S"),
-    }
-    requests.post(slackUrl, data=json.dumps(data))
-    return {"success": True, "post id": response[0]}
+    slackUrl = "https://hooks.slack.com/triggers/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"
+    requests.post(slackUrl, data=json.dumps(response))
+    return {"success": True, "post id": response["id"]}
 
 
 # 게시글 전체 조회
