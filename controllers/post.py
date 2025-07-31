@@ -21,7 +21,7 @@ def create_post(post: PostCreate_Update, user: DB_User, db: Session):
     response = {
         "message": "새로운 게시글이 등록되었습니다!",
         "id": db_post.id,
-        "title": post.title,
+        "title": db_post.title,
         "username": user.username,
     }
     return response
