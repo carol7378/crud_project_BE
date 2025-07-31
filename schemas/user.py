@@ -33,7 +33,7 @@ class UserCreate(BaseModel):
     @field_validator("password", mode="before")
     @classmethod
     def password_form(cls, v):
-        if not re.compile(r"[A-Za-z\d]{8,16}$").match(v):
+        if not re.compile(r"^[A-Za-z\d]{8,16}$").match(v):
             raise HTTPException(
                 status_code=400,
                 detail="비밀번호는 최소 8자, 촤대 16자이며, 알파벳과 숫자로 구성됩니다.",

@@ -24,7 +24,7 @@ def create_post(post: PostCreate_Update, user: DB_User, db: Session):
 def read_posts(db: Session):
     stmt = (
         select(DB_Post.id, DB_Post.title, DB_User.username, DB_Post.create_at)
-        .join(DB_Post, DB_User.id == DB_Post.user_id)
+        .join(DB_User, DB_User.id == DB_Post.user_id)
         .filter(DB_Post.removed_at.is_(None))
         .order_by(DB_Post.create_at.desc())
     )
