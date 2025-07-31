@@ -25,7 +25,7 @@ dbDep = Annotated[Session, Depends(get_db)]
 @router.post("/")
 def create_post_api(post: PostCreate_Update, user: tokenDep, db: dbDep):
     response = create_post(db=db, user=user, post=post)
-    slackUrl = "https://hooks.slack.com/triggers/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"
+    slackUrl = "https://hooks.slack.com/triggers/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"
     requests.post(slackUrl, data=json.dumps(response))
     return {"success": True, "post id": response["id"]}
 
