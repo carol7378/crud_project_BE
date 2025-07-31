@@ -1,7 +1,6 @@
-from typing import Annotated, Optional
-from fastapi.security import APIKeyHeader
+from typing import Annotated
 from sqlalchemy.orm import Session
-from fastapi import APIRouter, Depends, Header, Request
+from fastapi import APIRouter, Depends
 from controllers.post import (
     create_post,
     read_post,
@@ -11,16 +10,16 @@ from controllers.post import (
 )
 from database import get_db
 from models.user import User
-from schemas.post import PostCreate, PostUpdate
+from schemas.post import PostCreate_Update
 from helpers.auth import decode_jwt_token
-from schemas.user import Token
 
 router = APIRouter(prefix="/api/posts", tags=["Posts"])
 
 
+# 게시글 생성
 @router.post("/")
 def create_post_api(
-    post: PostCreate,
+    post: PostCreate_Update,
     user: Annotated[User, Depends(decode_jwt_token)],
     db: Annotated[Session, Depends(get_db)],
 ):
@@ -28,6 +27,7 @@ def create_post_api(
     return response
 
 
+# 게시글 전체 조회
 @router.get("/")
 def read_posts_api(
     user: Annotated[User, Depends(decode_jwt_token)],
@@ -37,6 +37,7 @@ def read_posts_api(
     return response
 
 
+# 게시글 1건 조회
 @router.get("/{id}")
 def read_post_api(
     id: int,
@@ -51,7 +52,7 @@ def read_post_api(
 @router.put("/{id}")
 def update_post_api(
     id: int,
-    post: PostUpdate,
+    post: PostCreate_Update,
     user: Annotated[User, Depends(decode_jwt_token)],
     db: Session = Depends(get_db),
 ):

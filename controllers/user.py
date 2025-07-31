@@ -1,12 +1,12 @@
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 from models.user import User
-from datetime import timedelta
 from helpers.auth import create_access_token
 from constants.user import pwd_context
 import schemas.user as schemas
 
 
+# 유저 생성
 def create_user(user: schemas.UserCreate, db: Session):
     existing_user = db.query(User).filter(User.username == user.username).first()
     if existing_user:
@@ -16,6 +16,7 @@ def create_user(user: schemas.UserCreate, db: Session):
     db.commit()
 
 
+# 유저 로그인
 def login_user(user: schemas.UserLogin, db: Session):
     db_user = db.query(User).filter(User.username == user.username).first()
     if not db_user or not pwd_context.verify(user.password, db_user.password):

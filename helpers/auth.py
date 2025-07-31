@@ -1,7 +1,7 @@
 import datetime
 from typing import Optional
-from fastapi import Depends, HTTPException, Header
-from fastapi.security import APIKeyHeader, HTTPAuthorizationCredentials, HTTPBearer
+from fastapi import Depends, HTTPException
+from fastapi.security import APIKeyHeader
 from sqlalchemy.orm import Session
 import jwt
 import pytz
@@ -35,7 +35,7 @@ def decode_jwt_token(
     Authorization: str = Depends(auth_header), db: Session = Depends(get_db)
 ):
     try:
-        if Authorization is None or Authorization.split()[0] != "Bearer":
+        if len(Authorization.split()) != 2 or Authorization.split()[0] != "Bearer":
             raise HTTPException(status_code=401, detail="Authorization Error")
         token = Authorization.split()[1]
         payload = jwt.decode(token, SECRET_KEY, algorithms=ALGORITHM)
