@@ -35,6 +35,8 @@ def decode_jwt_token(
     Authorization: str = Depends(auth_header), db: Session = Depends(get_db)
 ):
     try:
+        if Authorization is None:
+            raise HTTPException(status_code=401, detail="Authorization Error")
         if len(Authorization.split()) != 2 or Authorization.split()[0] != "Bearer":
             raise HTTPException(status_code=401, detail="Authorization Error")
         token = Authorization.split()[1]

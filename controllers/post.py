@@ -17,7 +17,19 @@ def create_post(post: PostCreate_Update, user: DB_User, db: Session):
     )
     db.add(db_post)
     db.commit()
-    return {"success": True, "post_id": db_post.id}
+    stmt = (
+        select(
+            DB_Post.id,
+            DB_Post.title,
+            DB_User.username,
+            DB_Post.content,
+            DB_Post.create_at,
+        )
+        .join(DB_User, DB_User.id == db_post.user_id)
+        .filter(DB_Post.id == db_post.id)
+    )
+    response = db.execute(stmt).all()
+    return response[0]
 
 
 # 게시글 리스트 조회
