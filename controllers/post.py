@@ -5,11 +5,11 @@ from fastapi import HTTPException
 import datetime
 from models.user import User as DB_User
 from models.post import Post as DB_Post
-from schemas.post import PostBase, PostCreate, Post, PostUpdate
+from schemas.post import PostBase, PostCreate_Update, PostDetail
 
 
 # 게시글 작성
-def create_post(post: PostCreate, user: DB_User, db: Session):
+def create_post(post: PostCreate_Update, user: DB_User, db: Session):
     db_post = DB_Post(
         title=post.title,
         user_id=user.id,
@@ -17,7 +17,35 @@ def create_post(post: PostCreate, user: DB_User, db: Session):
     )
     db.add(db_post)
     db.commit()
-    return {"success": True, "post_id": db_post.id}
+    db.refresh(db_post)
+    response = {
+        "message": "새로운 게시글이 등록되었습니다!",
+        "id": db_post.id,
+        "title": db_post.title,
+        "username": user.username,
+    }
+    return response
+
+
+# 게시글 리스트 조회
+def read_posts(db: Session):
+    stmt = (
+        select(DB_Post.id, DB_Post.title, DB_User.username, DB_Post.create_at)
+        .join(DB_User, DB_User.id == DB_Post.user_id)
+        .filter(DB_Post.removed_at.is_(None))
+        .order_by(DB_Post.create_at.desc())
+    )
+    posts = db.execute(stmt).all()
+    all_post = [
+        PostBase(
+            id=id,
+            title=title,
+            username=username,
+            create_at=create_at.strftime("%Y-%m-%d %H:%M:%S"),
+        )
+        for id, title, username, create_at in posts
+    ]
+    return all_post
 
 
 # 게시글 1건 조회
@@ -36,7 +64,7 @@ def read_post(id: int, db: Session):
 
     if db_post is None:
         raise HTTPException(status_code=404, detail="Post not found")
-    return Post(
+    return PostDetail(
         id=db_post.id,
         title=db_post.title,
         username=db_post.username,
@@ -45,29 +73,8 @@ def read_post(id: int, db: Session):
     )
 
 
-# 게시글 리스트 조회
-def read_posts(db: Session):
-    stmt = (
-        select(DB_Post.id, DB_Post.title, DB_User.username, DB_Post.create_at)
-        .join(DB_Post, DB_User.id == DB_Post.user_id)
-        .filter(DB_Post.removed_at.is_(None))
-        .order_by(DB_Post.create_at.desc())
-    )
-    posts = db.execute(stmt).all()
-    all_post = [
-        PostBase(
-            id=id,
-            title=title,
-            username=username,
-            create_at=create_at.strftime("%Y-%m-%d %H:%M:%S"),
-        )
-        for id, title, username, create_at in posts
-    ]
-    return all_post
-
-
 # 게시글 수정
-def update_post(id: int, post: PostUpdate, user: DB_User, db: Session):
+def update_post(id: int, post: PostCreate_Update, user: DB_User, db: Session):
     db_post = (
         db.query(DB_Post).filter(DB_Post.id == id, DB_Post.removed_at.is_(None)).first()
     )

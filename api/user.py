@@ -1,3 +1,4 @@
+from typing import Annotated
 from fastapi import Depends, APIRouter
 from sqlalchemy.orm import Session
 from database import get_db
@@ -9,14 +10,16 @@ router = APIRouter(
     tags=["Users"],
 )
 
+dbDep = Annotated[Session, Depends(get_db)]
+
 
 @router.post("/")
-def user_create(user_create: UserCreate, db: Session = Depends(get_db)):
+def user_create(user_create: UserCreate, db: dbDep):
     create_user(db=db, user=user_create)
     return {"success": True}
 
 
 @router.post("/login", response_model=Token)
-def user_login(user_login: UserLogin, db: Session = Depends(get_db)):
+def user_login(user_login: UserLogin, db: dbDep):
     response = login_user(db=db, user=user_login)
     return response
