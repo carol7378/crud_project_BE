@@ -9,6 +9,11 @@ class PostBase(BaseModel):
     username: str = Field(..., description="작성자의 닉네임")
     create_at: str = Field(..., description="게시글 생성시간")
 
+    @field_validator("create_at", mode="before")
+    @classmethod
+    def to_string(cls, v):
+        return v.strftime("%Y-%m-%d %H:%M:%S")
+
 
 # 게시글 상세 조회 출력 형식
 class PostDetail(PostBase):

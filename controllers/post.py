@@ -5,7 +5,7 @@ from fastapi import HTTPException
 import datetime
 from models.user import User as DB_User
 from models.post import Post as DB_Post
-from schemas.post import PostBase, PostCreate, PostUpdate, PostDetail
+from schemas.post import PostCreate, PostUpdate
 
 
 # 게시글 작성
@@ -36,16 +36,7 @@ def read_posts(db: Session):
         .order_by(DB_Post.create_at.desc())
     )
     posts = db.execute(stmt).all()
-    all_post = [
-        PostBase(
-            id=id,
-            title=title,
-            username=username,
-            create_at=create_at.strftime("%Y-%m-%d %H:%M:%S"),
-        )
-        for id, title, username, create_at in posts
-    ]
-    return all_post
+    return posts
 
 
 # 게시글 1건 조회
@@ -64,13 +55,7 @@ def read_post(id: int, db: Session):
 
     if db_post is None:
         raise HTTPException(status_code=404, detail="Post not found")
-    return PostDetail(
-        id=db_post.id,
-        title=db_post.title,
-        username=db_post.username,
-        content=db_post.content,
-        create_at=db_post.create_at.strftime("%Y-%m-%d %H:%M:%S"),
-    )
+    return db_post
 
 
 # 게시글 수정

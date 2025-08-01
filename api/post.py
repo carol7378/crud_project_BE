@@ -1,5 +1,5 @@
 import json
-from typing import Annotated
+from typing import Annotated, List
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends
 from controllers.post import (
@@ -11,7 +11,7 @@ from controllers.post import (
 )
 from database import get_db
 from models.user import User
-from schemas.post import PostCreate, PostUpdate
+from schemas.post import PostBase, PostCreate, PostDetail, PostUpdate
 from helpers.auth import decode_jwt_token
 import requests
 
@@ -31,14 +31,14 @@ def create_post_api(post: PostCreate, user: tokenDep, db: dbDep):
 
 
 # 게시글 전체 조회
-@router.get("/")
+@router.get("/", response_model=List[PostBase])
 def read_posts_api(user: tokenDep, db: dbDep):
     response = read_posts(db=db)
     return response
 
 
 # 게시글 1건 조회
-@router.get("/{id}")
+@router.get("/{id}", response_model=PostDetail)
 def read_post_api(id: int, user: tokenDep, db: dbDep):
     response = read_post(id=id, db=db)
     return response
