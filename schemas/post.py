@@ -16,7 +16,7 @@ class PostDetail(PostBase):
 
 
 # 게시글 수정할 때 입력 형식, 게시글 만들 때 입력 형식
-class PostCreate_Update(BaseModel):
+class PostCreate(BaseModel):
     title: str = Field(..., description="게시글 제목", max_length=100)
     content: str = Field(..., description="게시글 본문", max_length=300)
 
@@ -26,3 +26,7 @@ class PostCreate_Update(BaseModel):
         if not v:
             raise HTTPException(status_code=400, detail="빈 값은 허용되지 않습니다.")
         return v
+
+
+class PostUpdate(PostCreate):
+    pass

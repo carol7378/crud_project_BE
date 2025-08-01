@@ -11,7 +11,7 @@ from controllers.post import (
 )
 from database import get_db
 from models.user import User
-from schemas.post import PostCreate_Update
+from schemas.post import PostCreate, PostUpdate
 from helpers.auth import decode_jwt_token
 import requests
 
@@ -23,7 +23,7 @@ dbDep = Annotated[Session, Depends(get_db)]
 
 # 게시글 생성
 @router.post("/")
-def create_post_api(post: PostCreate_Update, user: tokenDep, db: dbDep):
+def create_post_api(post: PostCreate, user: tokenDep, db: dbDep):
     response = create_post(db=db, user=user, post=post)
     slackUrl = "https://hooks.slack.com/triggers/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"
     requests.post(slackUrl, data=json.dumps(response))
@@ -46,7 +46,7 @@ def read_post_api(id: int, user: tokenDep, db: dbDep):
 
 # 게시글 수정
 @router.put("/{id}")
-def update_post_api(id: int, post: PostCreate_Update, user: tokenDep, db: dbDep):
+def update_post_api(id: int, post: PostUpdate, user: tokenDep, db: dbDep):
     response = update_post(id=id, post=post, user=user, db=db)
     return response
 

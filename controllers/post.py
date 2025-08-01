@@ -5,11 +5,11 @@ from fastapi import HTTPException
 import datetime
 from models.user import User as DB_User
 from models.post import Post as DB_Post
-from schemas.post import PostBase, PostCreate_Update, PostDetail
+from schemas.post import PostBase, PostCreate, PostUpdate, PostDetail
 
 
 # 게시글 작성
-def create_post(post: PostCreate_Update, user: DB_User, db: Session):
+def create_post(post: PostCreate, user: DB_User, db: Session):
     db_post = DB_Post(
         title=post.title,
         user_id=user.id,
@@ -74,7 +74,7 @@ def read_post(id: int, db: Session):
 
 
 # 게시글 수정
-def update_post(id: int, post: PostCreate_Update, user: DB_User, db: Session):
+def update_post(id: int, post: PostUpdate, user: DB_User, db: Session):
     db_post = (
         db.query(DB_Post).filter(DB_Post.id == id, DB_Post.removed_at.is_(None)).first()
     )
