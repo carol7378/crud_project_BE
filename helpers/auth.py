@@ -9,7 +9,7 @@ from database import get_db
 from models.user import User
 from schemas.user import TokenEncode
 
-SECRET_KEY = "SECRET_KEY"
+SECRET_KEY = "a840e971b790eb005b7f6a1be72fb977d687f7d5d28be909ab4db9239174eef8"
 ALGORITHM = "HS256"
 from constants.user import ACCESS_TOKEN_EXPIRE_MINUTES
 
