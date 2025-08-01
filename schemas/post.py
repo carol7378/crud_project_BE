@@ -20,7 +20,7 @@ class PostDetail(PostBase):
     content: str = Field(..., description="게시글 본문")
 
 
-# 게시글 수정할 때 입력 형식, 게시글 만들 때 입력 형식
+# 게시글 만들 때 입력 형식
 class PostCreate(BaseModel):
     title: str = Field(..., description="게시글 제목", max_length=100)
     content: str = Field(..., description="게시글 본문", max_length=300)
@@ -33,5 +33,6 @@ class PostCreate(BaseModel):
         return v
 
 
+# 게시글 수정할 때 입력 형식
 class PostUpdate(PostCreate):
     pass
