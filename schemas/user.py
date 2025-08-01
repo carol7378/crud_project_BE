@@ -40,12 +40,15 @@ class UserCreate(BaseModel):
             )
         return v
 
-    @field_validator("username", "password", "password_check", "name", mode="before")
+    @model_validator(mode="before")
     @classmethod
-    def not_empty(cls, v):
-        if not v:
-            raise HTTPException(status_code=400, detail="빈 값은 허용되지 않습니다.")
-        return v
+    def not_empty(cls, values):
+        for key, value in values.items():
+            if value is None or str(value).strip() == "":
+                raise HTTPException(
+                    status_code=400, detail="빈 값은 허용되지 않습니다."
+                )
+        return values
 
     @model_validator(mode="after")
     @classmethod
