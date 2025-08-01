@@ -30,16 +30,6 @@ class UserCreate(BaseModel):
     password_check: str = Field(..., description="작성한 비밀번호를 다시 입력")
     name: str = Field(..., description="사용자의 실제 이름")
 
-    @field_validator("password", mode="before")
-    @classmethod
-    def password_form(cls, v):
-        if not re.compile(r"^[A-Za-z\d]{8,16}$").match(v):
-            raise HTTPException(
-                status_code=400,
-                detail="비밀번호는 최소 8자, 촤대 16자이며, 알파벳과 숫자로 구성됩니다.",
-            )
-        return v
-
     @model_validator(mode="before")
     @classmethod
     def not_empty(cls, values):
