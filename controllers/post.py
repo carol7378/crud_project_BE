@@ -29,7 +29,7 @@ def create_post(post: PostCreate, user: DB_User, db: Session):
 
 # 게시글 10개씩 불러오기
 def read_posts(page: int, db: Session):
-    if page < 1:
+    if page < 0:
         raise HTTPException(status_code=400, detail="wrong page number")
     total = db.query(DB_Post).count()
     posts_query = (
