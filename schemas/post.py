@@ -19,9 +19,9 @@ class PostPagination(BaseModel):
     total: int = Field(..., description="게시글에 대한 id")
     page: int = Field(..., description="게시글에 대한 id")
     limit: int = Field(..., description="게시글에 대한 id")
-    data: list[PostBase] = Field(..., description="게시글에 대한 id")
+    page_data: list[PostBase] = Field(..., description="게시글에 대한 id")
 
-    @field_validator("data", mode="before")
+    @field_validator("page_data", mode="before")
     @classmethod
     def to_PostBase(cls, v):
         data = []

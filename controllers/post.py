@@ -50,7 +50,7 @@ def create_post(post: PostCreate, user: DB_User, db: Session):
 #     return posts
 
 
-def read_posts(page: int, limit: int, db: Session):
+def read_posts(page: int, db: Session):
     if page < 0:
         raise HTTPException(status_code=404, detail="Post not found")
     # Count total items for pagination
@@ -62,7 +62,7 @@ def read_posts(page: int, limit: int, db: Session):
         .filter(DB_Post.removed_at.is_(None))
         .order_by(DB_Post.create_at.desc())
         .offset(page * 10)
-        .limit(limit)
+        .limit(10)
     )
     posts = db.execute(posts_query).all()
     next_page = True
@@ -74,8 +74,8 @@ def read_posts(page: int, limit: int, db: Session):
     return {
         "total": total,
         "page": page + 1,
-        "limit": limit,
-        "data": posts,
+        "limit": 10,
+        "page_data": posts,
     }
 
 
