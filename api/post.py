@@ -38,12 +38,7 @@ def read_posts_api(
     page: int = Query(None),
 ):
     response = read_posts(db=db, page=page - 1)
-    return {
-        "total": response["total"],
-        "page": response["page"],
-        "limit": response["limit"],
-        "page_data": response["page_data"],
-    }
+    return response
 
 
 # 게시글 1건 조회
