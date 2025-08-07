@@ -30,16 +30,12 @@ def create_post_api(post: PostCreate, user: tokenDep, db: dbDep):
     return {"success": True, "post id": response["id"]}
 
 
-# # 게시글 전체 조회
-# @router.get("/", response_model=List[PostBase])
-# def read_posts_api(user: tokenDep, db: dbDep, limit: int = 10, curser: int = Query()):
-#     response = read_posts(db=db, curser=curser, limit=limit)
-#     return response
+# 게시글 10개씩 조회
 @router.get("/", response_model=PostPagination)
 def read_posts_api(
     user: tokenDep,
     db: dbDep,
-    page: int = Query(1, ge=1, description="Number of items to page"),
+    page: int = Query(None),
 ):
     response = read_posts(db=db, page=page - 1)
     return {

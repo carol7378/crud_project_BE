@@ -5,11 +5,7 @@ from fastapi import HTTPException
 import datetime
 from models.user import User as DB_User
 from models.post import Post as DB_Post
-from schemas.post import PostBase, PostCreate, PostUpdate
-
-from fastapi_pagination import set_params, set_page
-from fastapi_pagination.cursor import CursorPage, CursorParams
-from fastapi_pagination.ext.sqlalchemy import paginate
+from schemas.post import PostCreate, PostUpdate
 
 
 # 게시글 작성
@@ -31,31 +27,11 @@ def create_post(post: PostCreate, user: DB_User, db: Session):
     return response
 
 
-# 게시글 리스트 조회
-# def read_posts(db: Session, curser: int, limit: int):
-#     stmt = (
-#         select(DB_Post.id, DB_Post.title, DB_User.username, DB_Post.create_at)
-#         .join(DB_User, DB_User.id == DB_Post.user_id)
-#         .filter(DB_Post.removed_at.is_(None))
-#         .order_by(DB_Post.create_at.desc())
-#         .limit(limit)
-#     )
-#     if not curser:
-#         if curser < 2:
-#             raise HTTPException(status_code=404, detail="Post finished")
-#         stmt = stmt.filter(DB_Post.id < curser)
-#     posts = db.execute(stmt).all()
-#     if posts is None:
-#         raise HTTPException(status_code=404, detail="Post not found")
-#     return posts
-
-
+# 게시글 10개씩 불러오기
 def read_posts(page: int, db: Session):
-    if page < 0:
-        raise HTTPException(status_code=404, detail="Post not found")
-    # Count total items for pagination
+    if page < 1:
+        raise HTTPException(status_code=400, detail="wrong page number")
     total = db.query(DB_Post).count()
-    # Retrieve paginated items
     posts_query = (
         select(DB_Post.id, DB_Post.title, DB_User.username, DB_Post.create_at)
         .join(DB_User, DB_User.id == DB_Post.user_id)
@@ -65,12 +41,8 @@ def read_posts(page: int, db: Session):
         .limit(10)
     )
     posts = db.execute(posts_query).all()
-    next_page = True
-    if len(posts) < 10:
-        if len(posts) == 0:
-            raise HTTPException(status_code=404, detail="Post not found")
-        next_page = False
-    # Return a structured response
+    if len(posts) == 0:
+        raise HTTPException(status_code=404, detail="END")
     return {
         "total": total,
         "page": page + 1,
