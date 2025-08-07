@@ -1,7 +1,7 @@
 import json
 from typing import Annotated, List
 from sqlalchemy.orm import Session
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, Query
 from controllers.post import (
     create_post,
     read_post,
@@ -11,7 +11,7 @@ from controllers.post import (
 )
 from database import get_db
 from models.user import User
-from schemas.post import PostBase, PostCreate, PostDetail, PostUpdate
+from schemas.post import PostBase, PostCreate, PostDetail, PostPagination, PostUpdate
 from helpers.auth import decode_jwt_token
 import requests
 
@@ -30,11 +30,26 @@ def create_post_api(post: PostCreate, user: tokenDep, db: dbDep):
     return {"success": True, "post id": response["id"]}
 
 
-# 게시글 전체 조회
-@router.get("/", response_model=List[PostBase])
-def read_posts_api(user: tokenDep, db: dbDep):
-    response = read_posts(db=db)
-    return response
+# # 게시글 전체 조회
+# @router.get("/", response_model=List[PostBase])
+# def read_posts_api(user: tokenDep, db: dbDep, limit: int = 10, curser: int = Query()):
+#     response = read_posts(db=db, curser=curser, limit=limit)
+#     return response
+@router.get("/", response_model=PostPagination)
+def read_posts_api(
+    user: tokenDep,
+    skip: int = Query(0, ge=0, description="Number of items to skip"),
+    limit: int = Query(10, ge=1, le=100, description="Number of items to fetch"),
+    db: Session = Depends(get_db),
+):
+    response = read_posts(db=db, skip=skip - 1, limit=limit)
+    return {
+        "total": response["total"],
+        "skip": response["skip"],
+        "limit": response["limit"],
+        "NEXT_PAGING_YN": response["NEXT_PAGING_YN"],
+        "data": response["data"],
+    }
 
 
 # 게시글 1건 조회

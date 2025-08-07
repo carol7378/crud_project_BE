@@ -15,6 +15,29 @@ class PostBase(BaseModel):
         return v.strftime("%Y-%m-%d %H:%M:%S")
 
 
+class PostPagination(BaseModel):
+    total: int = Field(..., description="게시글에 대한 id")
+    skip: int = Field(..., description="게시글에 대한 id")
+    limit: int = Field(..., description="게시글에 대한 id")
+    NEXT_PAGING_YN: bool = Field(..., description="게시글에 대한 id")
+    data: list[PostBase] = Field(..., description="게시글에 대한 id")
+
+    @field_validator("data", mode="before")
+    @classmethod
+    def to_PostBase(cls, v):
+        data = []
+        for value in v:
+            data.append(
+                PostBase(
+                    id=value.id,
+                    title=value.title,
+                    username=value.username,
+                    create_at=value.create_at,
+                )
+            )
+        return data
+
+
 # 게시글 상세 조회 출력 형식
 class PostDetail(PostBase):
     content: str = Field(..., description="게시글 본문")

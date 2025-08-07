@@ -5,7 +5,11 @@ from fastapi import HTTPException
 import datetime
 from models.user import User as DB_User
 from models.post import Post as DB_Post
-from schemas.post import PostCreate, PostUpdate
+from schemas.post import PostBase, PostCreate, PostUpdate
+
+from fastapi_pagination import set_params, set_page
+from fastapi_pagination.cursor import CursorPage, CursorParams
+from fastapi_pagination.ext.sqlalchemy import paginate
 
 
 # 게시글 작성
@@ -28,15 +32,50 @@ def create_post(post: PostCreate, user: DB_User, db: Session):
 
 
 # 게시글 리스트 조회
-def read_posts(db: Session):
-    stmt = (
+# def read_posts(db: Session, curser: int, limit: int):
+#     stmt = (
+#         select(DB_Post.id, DB_Post.title, DB_User.username, DB_Post.create_at)
+#         .join(DB_User, DB_User.id == DB_Post.user_id)
+#         .filter(DB_Post.removed_at.is_(None))
+#         .order_by(DB_Post.create_at.desc())
+#         .limit(limit)
+#     )
+#     if not curser:
+#         if curser < 2:
+#             raise HTTPException(status_code=404, detail="Post finished")
+#         stmt = stmt.filter(DB_Post.id < curser)
+#     posts = db.execute(stmt).all()
+#     if posts is None:
+#         raise HTTPException(status_code=404, detail="Post not found")
+#     return posts
+
+
+def read_posts(skip: int, limit: int, db: Session):
+    # Count total items for pagination
+    total = db.query(DB_Post).count()
+    # Retrieve paginated items
+    posts_query = (
         select(DB_Post.id, DB_Post.title, DB_User.username, DB_Post.create_at)
         .join(DB_User, DB_User.id == DB_Post.user_id)
         .filter(DB_Post.removed_at.is_(None))
         .order_by(DB_Post.create_at.desc())
+        .offset(skip * 10)
+        .limit(limit)
     )
-    posts = db.execute(stmt).all()
-    return posts
+    posts = db.execute(posts_query).all()
+    next_page = True
+    if len(posts) < 10:
+        if len(posts) == 0:
+            raise HTTPException(status_code=404, detail="Post not found")
+        next_page = False
+    # Return a structured response
+    return {
+        "total": total,
+        "skip": skip,
+        "limit": limit,
+        "NEXT_PAGING_YN": next_page,
+        "data": posts,
+    }
 
 
 # 게시글 1건 조회
@@ -52,9 +91,6 @@ def read_post(id: int, db: Session):
         .filter(DB_Post.id == id, DB_Post.removed_at.is_(None))
         .join(DB_Post, DB_Post.user_id == DB_User.id)
     ).first()
-
-    if db_post is None:
-        raise HTTPException(status_code=404, detail="Post not found")
     return db_post
 
 
