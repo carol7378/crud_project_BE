@@ -50,7 +50,9 @@ def create_post(post: PostCreate, user: DB_User, db: Session):
 #     return posts
 
 
-def read_posts(skip: int, limit: int, db: Session):
+def read_posts(page: int, limit: int, db: Session):
+    if page < 0:
+        raise HTTPException(status_code=404, detail="Post not found")
     # Count total items for pagination
     total = db.query(DB_Post).count()
     # Retrieve paginated items
@@ -59,7 +61,7 @@ def read_posts(skip: int, limit: int, db: Session):
         .join(DB_User, DB_User.id == DB_Post.user_id)
         .filter(DB_Post.removed_at.is_(None))
         .order_by(DB_Post.create_at.desc())
-        .offset(skip * 10)
+        .offset(page * 10)
         .limit(limit)
     )
     posts = db.execute(posts_query).all()
@@ -71,9 +73,8 @@ def read_posts(skip: int, limit: int, db: Session):
     # Return a structured response
     return {
         "total": total,
-        "skip": skip,
+        "page": page + 1,
         "limit": limit,
-        "NEXT_PAGING_YN": next_page,
         "data": posts,
     }
 

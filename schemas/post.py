@@ -17,9 +17,8 @@ class PostBase(BaseModel):
 
 class PostPagination(BaseModel):
     total: int = Field(..., description="게시글에 대한 id")
-    skip: int = Field(..., description="게시글에 대한 id")
+    page: int = Field(..., description="게시글에 대한 id")
     limit: int = Field(..., description="게시글에 대한 id")
-    NEXT_PAGING_YN: bool = Field(..., description="게시글에 대한 id")
     data: list[PostBase] = Field(..., description="게시글에 대한 id")
 
     @field_validator("data", mode="before")

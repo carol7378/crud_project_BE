@@ -38,16 +38,15 @@ def create_post_api(post: PostCreate, user: tokenDep, db: dbDep):
 @router.get("/", response_model=PostPagination)
 def read_posts_api(
     user: tokenDep,
-    skip: int = Query(0, ge=0, description="Number of items to skip"),
+    page: int = Query(0, ge=0, description="Number of items to page"),
     limit: int = Query(10, ge=1, le=100, description="Number of items to fetch"),
     db: Session = Depends(get_db),
 ):
-    response = read_posts(db=db, skip=skip - 1, limit=limit)
+    response = read_posts(db=db, page=page - 1, limit=limit)
     return {
         "total": response["total"],
-        "skip": response["skip"],
+        "page": response["page"],
         "limit": response["limit"],
-        "NEXT_PAGING_YN": response["NEXT_PAGING_YN"],
         "data": response["data"],
     }
 
