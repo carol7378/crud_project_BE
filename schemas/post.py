@@ -26,14 +26,7 @@ class PostPagination(BaseModel):
     def to_PostBase(cls, v):
         data = []
         for value in v:
-            data.append(
-                PostBase(
-                    id=value.id,
-                    title=value.title,
-                    username=value.username,
-                    create_at=value.create_at,
-                )
-            )
+            data.append(PostBase(**value._asdict()))
         return data
 
 
