@@ -21,14 +21,6 @@ class PostPagination(BaseModel):
     limit: int = Field(..., description="페이지 당 게시글 수")
     page_data: list[PostBase] = Field(..., description="가져온 10개의 게시글 데이터")
 
-    @field_validator("page_data", mode="before")
-    @classmethod
-    def to_PostBase(cls, v):
-        data = []
-        for value in v:
-            data.append(PostBase(**value._asdict()))
-        return data
-
 
 # 게시글 상세 조회 출력 형식
 class PostDetail(PostBase):

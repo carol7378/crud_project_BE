@@ -31,7 +31,7 @@ def create_post(post: PostCreate, user: DB_User, db: Session):
 def read_posts(page: int, db: Session):
     if page < 0:
         raise HTTPException(status_code=400, detail="wrong page number")
-    total = db.query(DB_Post).count()
+    total = db.query(DB_Post).filter(DB_Post.removed_at.is_(None)).count()
     posts_query = (
         select(DB_Post.id, DB_Post.title, DB_User.username, DB_Post.create_at)
         .join(DB_User, DB_User.id == DB_Post.user_id)
@@ -41,8 +41,6 @@ def read_posts(page: int, db: Session):
         .limit(10)
     )
     posts = db.execute(posts_query).all()
-    if len(posts) == 0:
-        raise HTTPException(status_code=404, detail="END")
     return {
         "total": total,
         "page": page + 1,
