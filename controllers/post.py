@@ -1,4 +1,3 @@
-import pytz
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from fastapi import HTTPException

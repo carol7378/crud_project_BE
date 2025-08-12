@@ -35,7 +35,7 @@ def create_post_api(post: PostCreate, user: tokenDep, db: dbDep):
 def read_posts_api(
     user: tokenDep,
     db: dbDep,
-    page: int = Query(None),
+    page: int = Query(),
 ):
     response = read_posts(db=db, page=page - 1)
     return response
