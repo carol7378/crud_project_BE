@@ -1,4 +1,3 @@
-import pytz
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
@@ -27,16 +26,26 @@ def create_post(post: PostCreate, user: DB_User, db: Session):
     return response
 
 
-# 게시글 리스트 조회
-def read_posts(db: Session):
-    stmt = (
+# 게시글 10개씩 불러오기
+def read_posts(page: int, db: Session):
+    if page < 0:
+        raise HTTPException(status_code=400, detail="wrong page number")
+    total = db.query(DB_Post).filter(DB_Post.removed_at.is_(None)).count()
+    posts_query = (
         select(DB_Post.id, DB_Post.title, DB_User.username, DB_Post.create_at)
         .join(DB_User, DB_User.id == DB_Post.user_id)
         .filter(DB_Post.removed_at.is_(None))
         .order_by(DB_Post.create_at.desc())
+        .offset(page * 10)
+        .limit(10)
     )
-    posts = db.execute(stmt).all()
-    return posts
+    posts = db.execute(posts_query).all()
+    return {
+        "total": total,
+        "page": page + 1,
+        "limit": 10,
+        "page_data": posts,
+    }
 
 
 # 게시글 1건 조회
@@ -52,9 +61,6 @@ def read_post(id: int, db: Session):
         .filter(DB_Post.id == id, DB_Post.removed_at.is_(None))
         .join(DB_Post, DB_Post.user_id == DB_User.id)
     ).first()
-
-    if db_post is None:
-        raise HTTPException(status_code=404, detail="Post not found")
     return db_post
 
 
