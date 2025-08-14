@@ -30,7 +30,7 @@ def read_comments(post_id: int, page: int, db: Session):
         select(DB_Comment.id, DB_Comment.content, DB_Comment.created_at, DB_User.username)
         .join(DB_User, DB_User.id == DB_Comment.user_id)
         .filter(DB_Comment.post_id == post_id, DB_Comment.removed_at.is_(None))
-        .order_by(DB_Comment.created_at.asc())
+        .order_by(DB_Comment.id.asc())
         .offset(page * 10)
         .limit(10)
     )
