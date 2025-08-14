@@ -16,7 +16,6 @@ def create_comment(post_id: int, user: DB_User, comment: CommentCreate, db: Sess
     )
     db.add(db_comment)
     db.commit()
-    db.refresh(db_comment)
     return {
         "message": "댓글 작성이 완료되었습니다.", 
         "id": db_comment.id
