@@ -29,7 +29,7 @@ def read_comments_api(
     post_id: int, 
     user: tokenDep, 
     db: dbDep,
-    page: int = Query(),
+    page: int = Query(1),
 ):
     response = read_comments(post_id=post_id, db=db, page=page - 1)
     return response
