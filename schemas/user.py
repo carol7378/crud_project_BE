@@ -36,7 +36,7 @@ class UserCreate(BaseModel):
         if not re.compile(r"^[A-Za-z\d]{8,16}$").match(v):
             raise HTTPException(
                 status_code=400,
-                detail="비밀번호는 최소 8자, 촤대 16자이며, 알파벳과 숫자로 구성됩니다.",
+                detail="비밀번호는 최소 8자, 최대 16자이며, 알파벳과 숫자로 구성됩니다.",
             )
         return v
 
@@ -71,4 +71,31 @@ class UserLogin(BaseModel):
                 raise HTTPException(
                     status_code=400, detail="빈 값은 허용되지 않습니다."
                 )
+        return values
+
+
+# 유저 비밀번호 변경 시 입력 형식
+class PasswordUpdate(BaseModel):
+    current_password: str = Field(..., description="기존 비밀번호")
+    new_password: str = Field(..., description="새 비밀번호")
+    new_password_check: str = Field(..., description="새 비밀번호 확인")
+
+    @field_validator("new_password", mode="before")
+    @classmethod
+    def password_form(cls, v):
+        if not re.compile(r"^[A-Za-z\d]{8,16}$").match(v):
+            raise HTTPException(
+                status_code=400,
+                detail="비밀번호는 최소 8자, 최대 16자이며, 알파벳과 숫자로 구성됩니다.",
+            )
+        return v
+
+    @model_validator(mode="after")
+    @classmethod
+    def passwords_match(cls, values):
+        if values.new_password != values.new_password_check:
+            raise HTTPException(
+                status_code=400,
+                detail="새 비밀번호가 일치하지 않습니다."
+            )
         return values
