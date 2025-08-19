@@ -30,5 +30,5 @@ def user_login(user_login: UserLogin, db: dbDep):
 
 @router.put("/password")
 def password_update(password_update: PasswordUpdate, user: tokenDep, db: dbDep):
-    response = update_password(data=password_update, user=tokenDep, db=db)
+    response = update_password(data=password_update, user=user, db=db)
     return response
