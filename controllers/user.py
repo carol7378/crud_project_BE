@@ -44,16 +44,14 @@ def login_user(user: schemas.UserLogin, db: Session):
 
 # 유저 비밀번호 변경
 def update_password(data: schemas.PasswordUpdate, db: Session, user: tokenDep):
-    db_user = db.query(User).filter(User.id == user.id).first()
-    if not db_user or not pwd_context.verify(
-        data.current_password, db_user.password
-    ):
+    if not pwd_context.verify(data.current_password, user.password):
         raise HTTPException(
             status_code=400, detail="Current password is incorrect"
         )
     if data.new_password != data.new_password_check:
         raise HTTPException(
-            status_code=400, detail="New password is incorrect")
-    db_user.password = pwd_context.hash(data.new_password)
+            status_code=400, detail="New password is incorrect"
+        )
+    user.password = pwd_context.hash(data.new_password)
     db.commit()
     return {"success": True}
