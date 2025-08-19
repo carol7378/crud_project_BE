@@ -13,6 +13,7 @@ router = APIRouter(
 )
 
 dbDep = Annotated[Session, Depends(get_db)]
+tokenDep = Annotated[User, Depends(decode_jwt_token)]
 
 
 @router.post("/")
@@ -26,8 +27,6 @@ def user_login(user_login: UserLogin, db: dbDep):
     response = login_user(db=db, user=user_login)
     return response
 
-
-tokenDep = Annotated[User, Depends(decode_jwt_token)]
 
 @router.put("/{id}/password")
 def password_update(id: int, password_update: PasswordUpdate, user: tokenDep, db: dbDep):
