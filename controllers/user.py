@@ -9,12 +9,17 @@ from helpers.auth import decode_jwt_token
 
 tokenDep = Annotated[User, Depends(decode_jwt_token)]
 
+
 # 유저 생성
 def create_user(user: schemas.UserCreate, db: Session):
-    existing_user = db.query(User).filter(User.username == user.username).first()
+    existing_user = (
+        db.query(User).filter(User.username == user.username).first()
+    )
     if existing_user:
         raise HTTPException(status_code=409, detail="user_id already exists")
-    db_user = User(username=user.username, password=user.password, name=user.name)
+    db_user = User(
+        username=user.username, password=user.password, name=user.name
+    )
     db.add(db_user)
     db.commit()
 
@@ -23,7 +28,9 @@ def create_user(user: schemas.UserCreate, db: Session):
 def login_user(user: schemas.UserLogin, db: Session):
     db_user = db.query(User).filter(User.username == user.username).first()
     if not db_user or not pwd_context.verify(user.password, db_user.password):
-        raise HTTPException(status_code=400, detail="Incorrect username or password")
+        raise HTTPException(
+            status_code=400, detail="Incorrect username or password"
+        )
 
     access_token = create_access_token(
         data=schemas.TokenEncode(username=db_user.username, id=db_user.id)
@@ -38,10 +45,15 @@ def login_user(user: schemas.UserLogin, db: Session):
 # 유저 비밀번호 변경
 def update_password(data: schemas.PasswordUpdate, db: Session, user: tokenDep):
     db_user = db.query(User).filter(User.id == user.id).first()
-    if not db_user or not pwd_context.verify(data.current_password, db_user.password):
-        raise HTTPException(status_code=400, detail="Current password is incorrect")
+    if not db_user or not pwd_context.verify(
+        data.current_password, db_user.password
+    ):
+        raise HTTPException(
+            status_code=400, detail="Current password is incorrect"
+        )
     if data.new_password != data.new_password_check:
-        raise HTTPException(status_code=400, detail="New password is incorrect")
+        raise HTTPException(
+            status_code=400, detail="New password is incorrect")
     db_user.password = pwd_context.hash(data.new_password)
     db.commit()
     return {"success": True}

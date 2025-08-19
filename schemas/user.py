@@ -54,7 +54,9 @@ class UserCreate(BaseModel):
     @classmethod
     def passwords_match(cls, values):
         if values.password != values.password_check:
-            raise HTTPException(status_code=400, detail="비밀번호가 일치하지 않습니다")
+            raise HTTPException(
+                status_code=400, detail="비밀번호가 일치하지 않습니다"
+            )
         return values
 
 

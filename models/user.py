@@ -7,7 +7,10 @@ from sqlalchemy.orm import relationship
 class User(Base):
     __tablename__ = "users"
     __table_args__ = (
-        {"mysql_character_set": "utf8mb4", "mysql_collate": "utf8mb4_0900_as_cs"},
+        {
+            "mysql_character_set": "utf8mb4",
+            "mysql_collate": "utf8mb4_0900_as_cs",
+        },
     )
     id = Column(
         Integer,
