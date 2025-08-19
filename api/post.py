@@ -1,5 +1,5 @@
 import json
-from typing import Annotated, List
+from typing import Annotated
 from sqlalchemy.orm import Session
 from fastapi import APIRouter, Depends, Query
 from controllers.post import (
@@ -11,7 +11,7 @@ from controllers.post import (
 )
 from database import get_db
 from models.user import User
-from schemas.post import PostBase, PostCreate, PostDetail, PostPagination, PostUpdate
+from schemas.post import PostCreate, PostDetail, PostPagination, PostUpdate
 from helpers.auth import decode_jwt_token
 import requests
 
@@ -27,6 +27,7 @@ def create_post_api(post: PostCreate, user: tokenDep, db: dbDep):
     response = create_post(db=db, user=user, post=post)
     slackUrl = "https://hooks.slack.com/triggers/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"
     requests.post(slackUrl, data=json.dumps(response))
+
     return {"success": True, "post id": response["id"]}
 
 
