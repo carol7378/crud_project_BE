@@ -1,10 +1,13 @@
-from fastapi import HTTPException
+from fastapi import HTTPException, Depends
 from sqlalchemy.orm import Session
 from models.user import User
 from helpers.auth import create_access_token
 from constants.user import pwd_context
 import schemas.user as schemas
+from typing import Annotated
+from helpers.auth import decode_jwt_token
 
+tokenDep = Annotated[User, Depends(decode_jwt_token)]
 
 # 유저 생성
 def create_user(user: schemas.UserCreate, db: Session):
@@ -33,15 +36,12 @@ def login_user(user: schemas.UserLogin, db: Session):
 
 
 # 유저 비밀번호 변경
-def update_password(id: int, data: schemas.PasswordUpdate, db: Session):
-    db_user = db.query(User).filter(User.id == id).first()
+def update_password(data: schemas.PasswordUpdate, db: Session, user: tokenDep):
+    db_user = db.query(User).filter(User.id == user.id).first()
     if not db_user or not pwd_context.verify(data.current_password, db_user.password):
         raise HTTPException(status_code=400, detail="Current password is incorrect")
     if data.new_password != data.new_password_check:
-        raise HTTPException(
-            status_code=400,
-            detail="New password is incorrect"
-        )
+        raise HTTPException(status_code=400, detail="New password is incorrect")
     db_user.password = pwd_context.hash(data.new_password)
     db.commit()
     return {"success": True}
