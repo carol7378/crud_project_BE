@@ -89,13 +89,3 @@ class PasswordUpdate(BaseModel):
                 detail="비밀번호는 최소 8자, 최대 16자이며, 알파벳과 숫자로 구성됩니다.",
             )
         return v
-
-    @model_validator(mode="after")
-    @classmethod
-    def passwords_match(cls, values):
-        if values.new_password != values.new_password_check:
-            raise HTTPException(
-                status_code=400,
-                detail="새 비밀번호가 일치하지 않습니다."
-            )
-        return values

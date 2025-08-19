@@ -37,7 +37,11 @@ def update_password(id: int, data: schemas.PasswordUpdate, db: Session):
     db_user = db.query(User).filter(User.id == id).first()
     if not db_user or not pwd_context.verify(data.current_password, db_user.password):
         raise HTTPException(status_code=400, detail="Current password is incorrect")
-
+    if data.new_password != data.new_password_check:
+        raise HTTPException(
+            status_code=400,
+            detail="New password is incorrect"
+        )
     db_user.password = pwd_context.hash(data.new_password)
     db.commit()
     return {"success": True}
