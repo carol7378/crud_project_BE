@@ -61,7 +61,7 @@ def read_post(id: int, db: Session, user: DB_User):
             DB_User.username,
             (DB_Bookmark.id.isnot(None)).label("is_bookmarked"),
         )
-        .join(DB_Post, DB_Post.user_id == DB_User.id)
+        .join(DB_User, DB_Post.user_id == DB_User.id)
         .outerjoin(
             DB_Bookmark,
             (DB_Post.id == DB_Bookmark.post_id) & (
