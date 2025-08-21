@@ -63,7 +63,6 @@ def add_bookmark(db: Session, user_id: int, post_id: int):
     db_bookmark = DB_Bookmark(user_id=user_id, post_id=post_id)
     db.add(db_bookmark)
     db.commit()
-    db.refresh(db_bookmark)
     return {"success": True, "bookmark_id": db_bookmark.id}
 
 
