@@ -48,7 +48,8 @@ def read_bookmarks(db: Session, user_id: int, page: int):
 
 # 북마크 추가
 def add_bookmark(db: Session, user_id: int, post_id: int):
-    post = db.query(DB_Post).filter(DB_Post.id == post_id).first()
+    post = db.query(DB_Post).filter(DB_Post.id == post_id,
+                                    DB_Post.removed_at.is_(None)).first()
     if not post:
         raise HTTPException(status_code=400, detail="wrong post id")
 
