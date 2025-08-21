@@ -59,30 +59,18 @@ def read_post(id: int, db: Session, user: DB_User):
             DB_Post.content,
             DB_Post.create_at,
             DB_User.username,
+            (DB_Bookmark.id.isnot(None)).label("is_bookmarked"),
+        )
+        .join(DB_Post, DB_Post.user_id == DB_User.id)
+        .outerjoin(
+            DB_Bookmark,
+            (DB_Post.id == DB_Bookmark.post_id) & (
+                DB_Bookmark.user_id == user.id),
         )
         .filter(DB_Post.id == id, DB_Post.removed_at.is_(None))
-        .join(DB_Post, DB_Post.user_id == DB_User.id)
     ).first()
 
-    # 북마크 여부
-    is_bookmarked = (
-        db.query(DB_Bookmark)
-        .filter(
-            DB_Bookmark.post_id == id,
-            DB_Bookmark.user_id == user.id,
-        )
-        .first()
-        is not None
-    )
-
-    return {
-        "id": db_post.id,
-        "title": db_post.title,
-        "content": db_post.content,
-        "create_at": db_post.create_at,
-        "username": db_post.username,
-        "is_bookmarked": is_bookmarked,
-    }
+    return db_post
 
 
 # 게시글 수정
