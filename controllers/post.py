@@ -46,7 +46,7 @@ def read_posts(page: int, db: Session):
         "total": total,
         "page": page + 1,
         "limit": 10,
-        "page_data": posts,
+        "posts": posts,
     }
 
 

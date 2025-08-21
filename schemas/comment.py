@@ -18,7 +18,7 @@ class CommentPagination(BaseModel):
     total: int = Field(..., description="댓글 전체 개수")
     page: int = Field(..., description="현재 페이지")
     limit: int = Field(..., description="페이지 당 댓글 수")
-    page_data: list[CommentBase] = Field(
+    comments: list[CommentBase] = Field(
         ..., description="가져온 10개의 댓글 데이터"
     )
 

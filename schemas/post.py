@@ -19,7 +19,7 @@ class PostPagination(BaseModel):
     total: int = Field(..., description="게시글 전체 개수")
     page: int = Field(..., description="현재 페이지")
     limit: int = Field(..., description="페이지 당 게시글 수")
-    page_data: list[PostBase] = Field(
+    posts: list[PostBase] = Field(
         ..., description="가져온 10개의 게시글 데이터"
     )
 
