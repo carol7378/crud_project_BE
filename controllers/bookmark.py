@@ -6,18 +6,27 @@ from models.post import Post as DB_Post
 from models.user import User as DB_User
 
 
-# 북마크 게시글 10개씩 불러오기
+# 북마크 게시글 5개씩 불러오기
 def read_bookmarks(db: Session, user_id: int, page: int):
     if page < 0:
         raise HTTPException(status_code=400, detail="wrong page number")
-    total = db.query(DB_Bookmark).join(
-        DB_Post, DB_Bookmark.post_id == DB_Post.id
-    ).filter(
-        DB_Bookmark.user_id == user_id,
-        DB_Post.removed_at.is_(None)
-    ).count()
+    total = (
+        db.query(DB_Bookmark)
+        .join(DB_Post, DB_Bookmark.post_id == DB_Post.id)
+        .filter(
+            DB_Bookmark.user_id == user_id,
+            DB_Post.removed_at.is_(None)
+        )
+        .count()
+    )
     bookmarks_query = (
-        db.query(DB_Bookmark, DB_Post, DB_User)
+        select(
+            DB_Bookmark.id.label("id"),
+            DB_Post.id.label("post_id"),
+            DB_Post.title.label("title"),
+            DB_User.username.label("username"),
+            DB_Post.create_at.label("create_at")
+        )
         .join(DB_Post, DB_Post.id == DB_Bookmark.post_id)
         .join(DB_User, DB_User.id == DB_Post.user_id)
         .filter(
@@ -27,17 +36,8 @@ def read_bookmarks(db: Session, user_id: int, page: int):
         .order_by(DB_Bookmark.id.desc())
         .offset(page * 5)
         .limit(5)
-        .all()
     )
-    bookmarks = []
-    for bm, post, user in bookmarks_query:
-        bookmarks.append({
-            "id": bm.id,
-            "post_id": post.id,
-            "title": post.title,
-            "username": user.username,
-            "create_at": post.create_at
-        })
+    bookmarks = db.execute(bookmarks_query).all()
     return {
         "total": total,
         "page": page + 1,
