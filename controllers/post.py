@@ -4,7 +4,9 @@ from fastapi import HTTPException
 import datetime
 from models.user import User as DB_User
 from models.post import Post as DB_Post
+from models.bookmark import Bookmark as DB_Bookmark
 from schemas.post import PostCreate, PostUpdate
+import pytz
 
 
 # 게시글 작성
@@ -49,7 +51,7 @@ def read_posts(page: int, db: Session):
 
 
 # 게시글 1건 조회
-def read_post(id: int, db: Session):
+def read_post(id: int, db: Session, user: DB_User):
     db_post = db.execute(
         select(
             DB_Post.id,
@@ -61,7 +63,26 @@ def read_post(id: int, db: Session):
         .filter(DB_Post.id == id, DB_Post.removed_at.is_(None))
         .join(DB_Post, DB_Post.user_id == DB_User.id)
     ).first()
-    return db_post
+
+    # 북마크 여부
+    is_bookmarked = (
+        db.query(DB_Bookmark)
+        .filter(
+            DB_Bookmark.post_id == id,
+            DB_Bookmark.user_id == user.id,
+        )
+        .first()
+        is not None
+    )
+
+    return {
+        "id": db_post.id,
+        "title": db_post.title,
+        "content": db_post.content,
+        "create_at": db_post.create_at,
+        "username": db_post.username,
+        "is_bookmarked": is_bookmarked,
+    }
 
 
 # 게시글 수정

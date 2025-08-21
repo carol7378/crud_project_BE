@@ -45,7 +45,7 @@ def read_posts_api(
 # 게시글 1건 조회
 @router.get("/{id}", response_model=PostDetail)
 def read_post_api(id: int, user: tokenDep, db: dbDep):
-    response = read_post(id=id, db=db)
+    response = read_post(id=id, db=db, user=user)
     return response
 
 
