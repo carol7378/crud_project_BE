@@ -36,7 +36,7 @@ def create_post_api(post: PostCreate, user: tokenDep, db: dbDep):
 def read_posts_api(
     user: tokenDep,
     db: dbDep,
-    page: int = Query(),
+    page: int = Query(1),
 ):
     response = read_posts(db=db, page=page - 1)
     return response
@@ -45,7 +45,7 @@ def read_posts_api(
 # 게시글 1건 조회
 @router.get("/{id}", response_model=PostDetail)
 def read_post_api(id: int, user: tokenDep, db: dbDep):
-    response = read_post(id=id, db=db)
+    response = read_post(id=id, db=db, user=user)
     return response
 
 

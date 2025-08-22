@@ -19,7 +19,7 @@ class PostPagination(BaseModel):
     total: int = Field(..., description="게시글 전체 개수")
     page: int = Field(..., description="현재 페이지")
     limit: int = Field(..., description="페이지 당 게시글 수")
-    page_data: list[PostBase] = Field(
+    posts: list[PostBase] = Field(
         ..., description="가져온 10개의 게시글 데이터"
     )
 
@@ -27,6 +27,7 @@ class PostPagination(BaseModel):
 # 게시글 상세 조회 출력 형식
 class PostDetail(PostBase):
     content: str = Field(..., description="게시글 본문")
+    is_bookmarked: bool = Field(..., description="북마크 여부 표시")
 
 
 # 게시글 만들 때 입력 형식
